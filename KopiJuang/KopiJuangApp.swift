@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct KopiJuangApp: App {
+    @AppStorage("hasCompletedFirstSession") var hasCompletedFirstSession: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if hasCompletedFirstSession {
+                MainTabView()
+            } else {
+                ContentView()  // belum pernah onboarding
+            }
         }
     }
 }
