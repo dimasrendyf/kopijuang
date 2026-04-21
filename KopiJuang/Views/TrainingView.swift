@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct TrainingView: View {
     @Environment(\.dismiss) var dismiss
     let flavor: String
@@ -89,6 +87,7 @@ struct TrainingView: View {
         case "fruity": return "jeruk/lemon"
         case "floral": return "bunga mawar"
         case "nutty": return "kacang/cokelat"
+        case "sweet": return "gula/madu"
         default: return "referensi"
         }
     }

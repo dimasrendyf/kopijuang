@@ -35,7 +35,13 @@ struct CoffeeSetupView: View {
             .navigationTitle("Persiapan Sesi")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SensoryInputView()) {
+                    NavigationLink(
+                        destination: SensoryInputView(
+                            beansName: beansName,
+                            grindSize: grindSize,
+                            packagingNotes: packagingNotes
+                        )
+                    ) {
                         Label("Mulai", systemImage: "checkmark")
                             .bold()
                     }
