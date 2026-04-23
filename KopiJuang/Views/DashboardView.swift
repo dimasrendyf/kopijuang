@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
-    @State private var showGuide = false
+    @State private var viewModel = DashboardViewModel()
     @Query(sort: \SessionHistory.date, order: .reverse) private var allSessions: [SessionHistory]
     
     var completedSessions: [SessionHistory] {
@@ -17,7 +17,8 @@ struct DashboardView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        @Bindable var viewModel = viewModel
+        return NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -62,7 +63,7 @@ struct DashboardView: View {
                 .navigationTitle("KopiJuang")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button { showGuide = true } label: {
+                        Button { viewModel.showGuide = true } label: {
                             Image(systemName: "questionmark.circle")
                                 .foregroundStyle(.secondary)
                         }
@@ -81,7 +82,7 @@ struct DashboardView: View {
                 .padding(.trailing)
                 .padding(.bottom, 18)
             }
-            .sheet(isPresented: $showGuide) {
+            .sheet(isPresented: $viewModel.showGuide) {
                 MasterPrepGuideView(isFirstRun: false)
             }
         }

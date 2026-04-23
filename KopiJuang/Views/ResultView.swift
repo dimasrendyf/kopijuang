@@ -13,31 +13,26 @@ struct ResultView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var userProgresses: [UserProgress]
 
-    let evaluation: SensoryEvaluation
-    
-    // State untuk feedback
-    @State private var showingFeedback = false
-    @State private var isCorrect = true
-    @State private var feedbackMessage = ""
-    @State private var selectedCategory: FlavorCategory?
-    @State private var showDiscovery = false
-    
-    // For navigation
-    @State private var navigateToCascading = false
-    
+    @State private var viewModel: ResultViewModel
+
+    init(evaluation: SensoryEvaluation) {
+        _viewModel = State(wrappedValue: ResultViewModel(evaluation: evaluation))
+    }
+
     var body: some View {
+        @Bindable var viewModel = viewModel
         ScrollView {
             VStack(spacing: 24) {
                 // 0. Session Meta
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(evaluation.beanName)
+                    Text(viewModel.evaluation.beanName)
                         .font(.title2.bold())
                     HStack(spacing: 8) {
-                        Text(evaluation.beanOrigin)
+                        Text(viewModel.evaluation.beanOrigin)
                         Text("•")
-                        Text("Roast \(evaluation.roastLevel)")
+                        Text("Roast \(viewModel.evaluation.roastLevel)")
                         Text("•")
-                        Text(evaluation.processLevel)
+                        Text(viewModel.evaluation.processLevel)
                     }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -48,11 +43,11 @@ struct ResultView: View {
                 
                 // 0.5 Fragrance vs Aroma
                 FragranceAromaSummaryCard(
-                    fragranceCategory: evaluation.fragranceCategory,
-                    fragranceIntensity: evaluation.fragranceIntensity,
-                    aromaCategory: evaluation.aromaCategory,
-                    aromaIntensity: evaluation.aromaIntensity,
-                    aromaContrast: evaluation.aromaContrast
+                    fragranceCategory: viewModel.evaluation.fragranceCategory,
+                    fragranceIntensity: viewModel.evaluation.fragranceIntensity,
+                    aromaCategory: viewModel.evaluation.aromaCategory,
+                    aromaIntensity: viewModel.evaluation.aromaIntensity,
+                    aromaContrast: viewModel.evaluation.aromaContrast
                 )
                 .padding(.horizontal)
                 
@@ -63,10 +58,10 @@ struct ResultView: View {
                         .foregroundStyle(.secondary)
                     
                     VStack(spacing: 12) {
-                        SensoryBar(label: "Asam", value: evaluation.acidity, max: 10)
-                        SensoryBar(label: "Manis", value: evaluation.sweetness, max: 10)
-                        SensoryBar(label: "Pahit", value: evaluation.bitterness, max: 10)
-                        SensoryBar(label: "Body", value: evaluation.bodyScore, max: 10)
+                        SensoryBar(label: "Asam", value: viewModel.evaluation.acidity, max: 10)
+                        SensoryBar(label: "Manis", value: viewModel.evaluation.sweetness, max: 10)
+                        SensoryBar(label: "Pahit", value: viewModel.evaluation.bitterness, max: 10)
+                        SensoryBar(label: "Body", value: viewModel.evaluation.bodyScore, max: 10)
                     }
                 }
                 .padding(24)
@@ -80,11 +75,11 @@ struct ResultView: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
                     
-                    Text(brewTipInsight)
+                    Text(viewModel.brewTipInsight)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
                     
-                    Text(brewTipAction)
+                    Text(viewModel.brewTipAction)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -108,12 +103,12 @@ struct ResultView: View {
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                         ForEach(FlavorCategory.allCases, id: \.self) { category in
                             CategoryButton(category: category) {
-                                checkAnswer(category)
+                                viewModel.checkAnswer(category, modelContext: modelContext, userProgresses: userProgresses)
                             }
                             .overlay(
-                                Image(systemName: selectedCategory == category ? "checkmark.circle.fill" : "circle")
+                                Image(systemName: viewModel.selectedCategory == category ? "checkmark.circle.fill" : "circle")
                                     .font(.title3)
-                                    .foregroundStyle(selectedCategory == category ? .brown : .secondary)
+                                    .foregroundStyle(viewModel.selectedCategory == category ? .brown : .secondary)
                                     .padding(12),
                                 alignment: .topTrailing
                             )
@@ -121,7 +116,7 @@ struct ResultView: View {
                     }
 
                     Button {
-                        showDiscovery = true
+                        viewModel.showDiscovery = true
                     } label: {
                         Text("Aku gak yakin, bantu discovery notes")
                             .font(.subheadline.weight(.semibold))
@@ -139,92 +134,30 @@ struct ResultView: View {
         }
         .background(Color(.secondarySystemBackground))
         .navigationTitle("Hasil Analisis")
-        .sheet(isPresented: $showingFeedback) {
+        .sheet(isPresented: $viewModel.showingFeedback) {
             FeedbackView(
-                isCorrect: isCorrect,
-                message: feedbackMessage,
-                category: selectedCategory ?? .fruity,
+                isCorrect: viewModel.isCorrect,
+                message: viewModel.feedbackMessage,
+                category: viewModel.selectedCategory ?? .fruity,
                 nextAction: {
-                    showingFeedback = false
-                    // Give sheet time to dismiss before navigating
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        navigateToCascading = true
-                    }
+                    viewModel.onFeedbackNextTapped()
                 }
             )
         }
-        .navigationDestination(isPresented: $navigateToCascading) {
-            if let cat = selectedCategory {
+        .navigationDestination(isPresented: $viewModel.navigateToCascading) {
+            if let cat = viewModel.selectedCategory {
                 CascadingQuizView(
-                    evaluation: evaluation,
+                    evaluation: viewModel.evaluation,
                     selectedPrimaryCategory: cat,
                     parentNodeId: cat.rawValue
                 )
             }
         }
-        .sheet(isPresented: $showDiscovery) {
+        .sheet(isPresented: $viewModel.showDiscovery) {
             NavigationStack {
                 DiscoveryNotesView(stage: .taste)
             }
         }
-    }
-
-    private var brewTipInsight: String {
-        let roast = evaluation.roastLevel.lowercased()
-        let process = evaluation.processLevel.lowercased()
-        
-        if evaluation.bitterness >= 8 && roast == "dark" {
-            return "Pahit dominan kemungkinan dari profil roast + ekstraksi."
-        }
-        if evaluation.acidity >= 8 && roast == "light" {
-            return "Keasaman terasa cukup agresif untuk profil light roast."
-        }
-        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
-            return "Manis alami dari process belum keluar maksimal."
-        }
-        if evaluation.bodyScore <= 4 {
-            return "Body terasa tipis, kemungkinan ekstraksi masih kurang."
-        }
-        
-        return "Cup kamu sudah cukup seimbang untuk parameter saat ini."
-    }
-    
-    private var brewTipAction: String {
-        let roast = evaluation.roastLevel.lowercased()
-        let process = evaluation.processLevel.lowercased()
-        
-        if evaluation.bitterness >= 8 && roast == "dark" {
-            return "Coba turunkan suhu ke 88-90C atau percepat waktu seduh."
-        }
-        if evaluation.acidity >= 8 && roast == "light" {
-            return "Coba gilingan sedikit lebih halus agar ekstraksi lebih seimbang."
-        }
-        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
-            return "Coba rasio sedikit lebih pekat atau naikkan suhu 1-2C."
-        }
-        if evaluation.bodyScore <= 4 {
-            return "Coba grind sedikit lebih halus atau tambah waktu kontak 10-15 detik."
-        }
-        
-        return "Pertahankan resep ini lalu ubah 1 variabel kecil saja di sesi berikutnya."
-    }
-    
-    func checkAnswer(_ category: FlavorCategory) {
-        selectedCategory = category
-        isCorrect = true
-        feedbackMessage = "\(category.rawValue) itu luas. Yuk lanjut, rasa turunan apa yang paling mendekati kopimu?"
-
-        let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
-        if !progress.unlockedPrimaryNotes.contains(category.rawValue) {
-            progress.unlockedPrimaryNotes.append(category.rawValue)
-        }
-        progress.appendExperiencedNote(category.rawValue)
-        do {
-            try modelContext.save()
-        } catch {
-            print("Failed saving ResultView progress: \(error.localizedDescription)")
-        }
-        showingFeedback = true
     }
 }
 
@@ -265,27 +198,27 @@ struct CategoryButton: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(accentColor(category).opacity(0.18))
+                        .fill(category.categoryAccentColor.opacity(0.18))
                         .frame(width: 44, height: 44)
-                    Image(systemName: iconForCategory(category))
+                    Image(systemName: category.categoryIconName)
                         .font(.title3.weight(.semibold))
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(category.rawValue)
                         .font(.headline)
-                    Text(descriptionForCategory(category))
+                    Text(category.categoryBlurb)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
                 Spacer(minLength: 0)
             }
-            .foregroundStyle(accentColor(category))
+            .foregroundStyle(category.categoryAccentColor)
             .padding(.vertical, 14)
             .padding(.horizontal, 14)
             .background(
                 LinearGradient(
-                    colors: [accentColor(category).opacity(0.16), accentColor(category).opacity(0.06)],
+                    colors: [category.categoryAccentColor.opacity(0.16), category.categoryAccentColor.opacity(0.06)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -293,39 +226,8 @@ struct CategoryButton: View {
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(accentColor(category).opacity(0.35), lineWidth: 1)
+                    .stroke(category.categoryAccentColor.opacity(0.35), lineWidth: 1)
             )
-        }
-    }
-    
-    private func accentColor(_ cat: FlavorCategory) -> Color {
-        switch cat {
-        case .floral: return .teal
-        case .fruity: return .orange
-        case .nutty: return .brown
-        case .sweet: return .pink
-        }
-    }
-    
-    func iconForCategory(_ cat: FlavorCategory) -> String {
-        switch cat {
-        case .fruity: return "leaf.fill"
-        case .floral: return "sparkles"
-        case .nutty: return "circle.grid.3x3.fill"
-        case .sweet: return "cube.fill"
-        }
-    }
-    
-    func descriptionForCategory(_ cat: FlavorCategory) -> String {
-        switch cat {
-        case .floral:
-            return "Nuansa bunga/teh lewat aroma retronasal."
-        case .fruity:
-            return "Karakter buah yang fresh dan cerah."
-        case .nutty:
-            return "Kacang/cokelat hangat yang membumi."
-        case .sweet:
-            return "Manis alami yang bikin cup terasa round."
         }
     }
 }

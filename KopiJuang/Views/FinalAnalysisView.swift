@@ -8,82 +8,26 @@ import SwiftData
 
 struct FinalAnalysisView: View {
     @Query private var userProgresses: [UserProgress]
-    let evaluation: SensoryEvaluation
-    let primaryCategory: FlavorCategory
-    let selectedNode: FlavorWheelNode?
+    @State private var viewModel: FinalAnalysisViewModel
 
-    private var secondaryNote: String? {
-        guard let node = selectedNode else { return nil }
-        if node.layer == 2 { return node.name }
-        if node.layer == 3, let parentId = node.parent {
-            return FlavorWheelNode.findNode(by: parentId)?.name
-        }
-        return nil
-    }
-
-    private var specificNote: String? {
-        guard let node = selectedNode, node.layer == 3 else { return nil }
-        return node.name
-    }
-
-    private var certaintyMessage: String {
-        if evaluation.aromaContrast == .unsure {
-            return "Wajar kalau tadi kamu sempat belum yakin membedakan dry dan wet aroma. Itu bagian normal dari latihan sensory. Kamu tetap berhasil memilih profil yang paling mendekati pengalamanmu."
-        }
-        return "Pilihanmu konsisten dengan alur sensory yang kamu isi. Mantap, ini langkah bagus untuk membangun memori rasa."
-    }
-
-    private var spotlightMessage: String {
-        if let secondaryNote, let specificNote {
-            return "Kamu memilih profil \(primaryCategory.rawValue) dengan turunan \(secondaryNote) dan note spesifik \(specificNote). Selamat, kamu sudah masuk level eksplorasi detail."
-        }
-        if let secondaryNote {
-            return "Kamu memilih profil \(primaryCategory.rawValue) dengan turunan \(secondaryNote). Ini sudah menunjukkan kamu mulai peka ke detail rasa."
-        }
-        return "Kamu memilih profil \(primaryCategory.rawValue). Selamat ya, kamu berhasil mengenali karakter utama dari cangkir ini."
-    }
-
-    private var brewGuidance: String {
-        let roast = evaluation.roastLevel.lowercased()
-        let process = evaluation.processLevel.lowercased()
-
-        if evaluation.aromaContrast == .unsure {
-            return "Untuk sesi berikutnya, coba jeda 15-20 detik antara cium dry dan wet lalu catat 1 kata kunci tiap fase. Teknik ini biasanya bantu mengurangi rasa ragu."
-        }
-        if evaluation.bitterness >= 8 && roast == "dark" {
-            return "Pahit dominan dari profil dark roast + ekstraksi. Besok coba turunkan suhu ke 88-90C."
-        }
-        if evaluation.acidity >= 8 && roast == "light" {
-            return "Keasaman cukup tajam. Besok coba grind sedikit lebih halus agar ekstraksi lebih seimbang."
-        }
-        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
-            return "Manis alami belum keluar maksimal. Besok coba rasio sedikit lebih pekat."
-        }
-        return "Cup kamu sudah cukup balance. Besok ubah satu variabel kecil saja (rasio/suhu/grind) agar progres belajar terasa jelas."
-    }
-    
-    private var selectedNoteExperienceCount: Int {
-        guard let selectedNode else { return 0 }
-        let experienced = userProgresses.flatMap(\.allExperiencedNotes)
-        return experienced.filter { $0 == selectedNode.name }.count
-    }
-    
-    private var familiarityLevel: String {
-        switch selectedNoteExperienceCount {
-        case 0:
-            return "Pemula"
-        case 1...2:
-            return "Pemula"
-        case 3...5:
-            return "Kenal"
-        case 6...9:
-            return "Akrab"
-        default:
-            return "Peka"
-        }
+    init(
+        evaluation: SensoryEvaluation,
+        primaryCategory: FlavorCategory,
+        selectedNode: FlavorWheelNode?
+    ) {
+        _viewModel = State(
+            wrappedValue: FinalAnalysisViewModel(
+                evaluation: evaluation,
+                primaryCategory: primaryCategory,
+                selectedNode: selectedNode
+            )
+        )
     }
 
     var body: some View {
+        let expCount = viewModel.selectedNoteExperienceCount(from: userProgresses)
+        let fam = viewModel.familiarityLevel(experienceCount: expCount)
+
         ScrollView {
             VStack(spacing: 18) {
                 VStack(spacing: 8) {
@@ -97,46 +41,46 @@ struct FinalAnalysisView: View {
                 .padding(.top, 8)
 
                 FinalCard(title: "Highlight Profil") {
-                    Text(spotlightMessage)
+                    Text(viewModel.spotlightMessage)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
                 FinalCard(title: "Status Keyakinan") {
-                    Text(certaintyMessage)
+                    Text(viewModel.certaintyMessage)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
                 FinalCard(title: "Profil Akhir") {
                     VStack(alignment: .leading, spacing: 8) {
-                        profileChip(text: primaryCategory.rawValue)
-                        if let secondaryNote {
+                        profileChip(text: viewModel.primaryCategory.rawValue)
+                        if let secondaryNote = viewModel.secondaryNote {
                             profileChip(text: secondaryNote)
                         }
-                        if let specificNote {
+                        if let specificNote = viewModel.specificNote {
                             profileChip(text: specificNote)
                         }
                     }
                 }
 
                 FinalCard(title: "Saran Next Seduhan") {
-                    Text(brewGuidance)
+                    Text(viewModel.brewGuidance)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
-                
+
                 FinalCard(title: "Progress Familiarity") {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Level saat ini: \(familiarityLevel)")
+                        Text("Level saat ini: \(fam)")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.brown)
-                        if let specificNote {
-                            Text("Note \(specificNote) sudah kamu rasakan \(selectedNoteExperienceCount)x.")
+                        if let specificNote = viewModel.specificNote {
+                            Text("Note \(specificNote) sudah kamu rasakan \(expCount)x.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
-                        } else if let secondaryNote {
-                            Text("Note \(secondaryNote) sudah kamu rasakan \(selectedNoteExperienceCount)x.")
+                        } else if let secondaryNote = viewModel.secondaryNote {
+                            Text("Note \(secondaryNote) sudah kamu rasakan \(expCount)x.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         } else {
@@ -148,7 +92,7 @@ struct FinalAnalysisView: View {
                 }
 
                 Button {
-                    NavigationUtil.popToRootView()
+                    NavigationService.popToRootView()
                 } label: {
                     Text("Selesai & Kembali ke Dashboard")
                         .font(.headline)

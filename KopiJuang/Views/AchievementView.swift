@@ -54,7 +54,7 @@ struct AchievementView: View {
             Spacer()
             
             Button {
-                NavigationUtil.popToRootView()
+                NavigationService.popToRootView()
             } label: {
                 Text("Selesai & Kembali ke Dashboard")
                     .font(.headline)
@@ -68,14 +68,5 @@ struct AchievementView: View {
             .padding(.bottom, 20)
         }
         .navigationBarBackButtonHidden(true)
-    }
-}
-
-// Helper untuk reset NavigationStack
-struct NavigationUtil {
-    static func popToRootView() {
-        let defaults = UserDefaults.standard
-        let counter = defaults.integer(forKey: "dashboardResetCounter")
-        defaults.set(counter + 1, forKey: "dashboardResetCounter")
     }
 }

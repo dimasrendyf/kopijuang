@@ -8,21 +8,16 @@
 import SwiftUI
 
 struct CoffeeSetupView: View {
-    @State private var beanName: String = ""
-    @State private var beanOrigin: String = ""
-    @State private var roastLevel: String = "" // Jangan isi default
-    @State private var processLevel: String = "" // Jangan isi default
-    
-    let roastOptions: [String] = ["Light", "Medium", "Dark", "Omni"]
-    let processOptions: [String] = ["Natural", "Wash", "Honey", "Anaerobic", "Wet Hulled"]
-    
+    @State private var viewModel = CoffeeSetupViewModel()
+
     var body: some View {
+        @Bindable var viewModel = viewModel
         List {
             Section {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Siapkan Cangkirmu")
                         .font(.title.bold())
-                    
+
                     Text("Ceritakan sedikit tentang kopi ini. Kami akan memandu indramu untuk menemukan rasa tersembunyi di dalamnya.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -31,59 +26,58 @@ struct CoffeeSetupView: View {
                 .padding(.vertical, 10)
             }
             .listRowBackground(Color.clear)
-            
+
             Section("Detail Beans") {
-                LabeledTextField(icon: "leaf.fill", placeholder: "Nama Kopi (contoh: Gayo)", text: $beanName)
-                LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $beanOrigin)
-                
-                // FIX PICKER: Tambahkan tag kosong
-                Picker("Roast Level", selection: $roastLevel) {
+                LabeledTextField(icon: "leaf.fill", placeholder: "Nama Kopi (contoh: Gayo)", text: $viewModel.beanName)
+                LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $viewModel.beanOrigin)
+
+                Picker("Roast Level", selection: $viewModel.roastLevel) {
                     Text("Pilih Level...").tag("")
-                    ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
+                    ForEach(viewModel.roastOptions, id: \.self) { Text($0).tag($0) }
                 }
-                .pickerStyle(.menu)
-                
-                if !roastLevel.isEmpty {
-                    Text(roastDescription(for: roastLevel))
+                .pickerStyle(.navigationLink)
+
+                if !viewModel.roastLevel.isEmpty {
+                    Text(viewModel.roastDescription(for: viewModel.roastLevel))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                
-                Picker("Process", selection: $processLevel) {
+
+                Picker("Process", selection: $viewModel.processLevel) {
                     Text("Pilih Proses...").tag("")
-                    ForEach(processOptions, id: \.self) { Text($0).tag($0) }
+                    ForEach(viewModel.processOptions, id: \.self) { Text($0).tag($0) }
                 }
-                .pickerStyle(.menu)
-                
-                if !processLevel.isEmpty {
-                    Text(processDescription(for: processLevel))
+                .pickerStyle(.navigationLink)
+
+                if !viewModel.processLevel.isEmpty {
+                    Text(viewModel.processDescription(for: viewModel.processLevel))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
-            
-            if !roastLevel.isEmpty && !processLevel.isEmpty {
+
+            if viewModel.showBeanInsight {
                 Section("Prediksi Karakter Cangkir") {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Insight Roast", systemImage: "flame.fill")
                             .font(.subheadline.bold())
                             .foregroundStyle(.brown)
-                        Text(roastDescription(for: roastLevel))
+                        Text(viewModel.roastDescription(for: viewModel.roastLevel))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        
+
                         Divider()
-                        
+
                         Label("Insight Process", systemImage: "drop.fill")
                             .font(.subheadline.bold())
                             .foregroundStyle(.brown)
-                        Text(processDescription(for: processLevel))
+                        Text(viewModel.processDescription(for: viewModel.processLevel))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        
+
                         Divider()
-                        
-                        Text("Fokus rasa awal: \(focusHint(roast: roastLevel, process: processLevel))")
+
+                        Text("Fokus rasa awal: \(viewModel.focusHint(roast: viewModel.roastLevel, process: viewModel.processLevel))")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.brown)
                     }
@@ -94,65 +88,18 @@ struct CoffeeSetupView: View {
         .scrollDismissesKeyboard(.interactively)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: SensoryInputView(beanName: beanName, beanOrigin: beanOrigin, roastLevel: roastLevel, processLevel: processLevel)) {
+                NavigationLink(
+                    destination: SensoryInputView(
+                        beanName: viewModel.beanName,
+                        beanOrigin: viewModel.beanOrigin,
+                        roastLevel: viewModel.roastLevel,
+                        processLevel: viewModel.processLevel
+                    )
+                ) {
                     Label("Mulai", systemImage: "checkmark").bold()
                 }
-                .disabled(beanName.isEmpty || roastLevel.isEmpty || processLevel.isEmpty)
+                .disabled(!viewModel.canStart)
             }
-        }
-    }
-    
-    func roastDescription(for level: String) -> String {
-        switch level {
-        case "Light": return "Acidity lebih terbaca, body ringan, notes origin lebih jelas."
-        case "Medium": return "Balance antara acidity dan body."
-        case "Dark": return "Body tebal, bitterness dominan, notes roast (cokelat, smoky)."
-        case "Omni": return "Fleksibel untuk filter maupun espresso."
-        default: return ""
-        }
-    }
-    
-    func processDescription(for process: String) -> String {
-        switch process {
-        case "Natural": return "Cenderung fruity, body lebih tebal, sweetness tinggi."
-        case "Wash": return "Clean, acidity lebih jelas, notes lebih defined."
-        case "Honey": return "Di antara natural dan washed, sweetness menonjol."
-        case "Anaerobic": return "Notes eksotik, seringkali ada karakter fermentasi/winey."
-        case "Wet Hulled": return "Body sangat tebal, acidity rendah, notes earthy/spicy khas Indonesia."
-        default: return ""
-        }
-    }
-    
-    func focusHint(roast: String, process: String) -> String {
-        switch (roast.lowercased(), process.lowercased()) {
-        case ("light", "natural"):
-            return "cek acidity cerah + sweetness fruity."
-        case ("light", "wash"), ("light", "washed"):
-            return "cek kejernihan acidity dan clean finish."
-        case ("dark", _):
-            return "cek body, bitterness, dan ketebalan aftertaste."
-        case (_, "honey"):
-            return "cek sweetness round dan mouthfeel nyaman."
-        case (_, "wet hulled"):
-            return "cek body tebal dan earthy note."
-        default:
-            return "cek keseimbangan acidity, sweetness, bitterness, dan body."
-        }
-    }
-}
-
-struct LabeledTextField: View {
-    let icon: String
-    let placeholder: String
-    @Binding var text: String
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Image(systemName: icon)
-                .foregroundStyle(.brown)
-            TextField(placeholder, text: $text)
-                .textFieldStyle(.plain)
-                .textInputAutocapitalization(.words)
         }
     }
 }

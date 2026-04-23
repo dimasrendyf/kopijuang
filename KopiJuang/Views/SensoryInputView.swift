@@ -10,99 +10,62 @@ import UIKit
 
 struct SensoryInputView: View {
     @Environment(\.dismiss) var dismiss
-    let beanName: String
-    let beanOrigin: String
-    let roastLevel: String
-    let processLevel: String
-    
-    enum Step: Int, CaseIterable {
-        case fragrance = 0
-        case aroma = 1
-        case taste = 2
-        
-        var title: String {
-            switch self {
-            case .fragrance: return "Fragrance"
-            case .aroma: return "Aroma"
-            case .taste: return "Taste"
-            }
-        }
-        
-        var subtitle: String {
-            switch self {
-            case .fragrance: return "Tahap 1: cium wangi kopi saat masih kering (belum dicampur air)."
-            case .aroma: return "Tahap 2: cium wangi kopi setelah kena air panas saat blooming."
-            case .taste: return "Tahap 3: nilai rasa saat diseruput (taste + retronasal)."
-            }
-        }
+    @State private var viewModel: SensoryInputViewModel
+
+    init(beanName: String, beanOrigin: String, roastLevel: String, processLevel: String) {
+        _viewModel = State(
+            wrappedValue: SensoryInputViewModel(
+                beanName: beanName,
+                beanOrigin: beanOrigin,
+                roastLevel: roastLevel,
+                processLevel: processLevel
+            )
+        )
     }
-    
-    @State private var step: Step = .fragrance
-    
-    // State 1
-    @State private var fragranceIntensity: Double = 6
-    @State private var fragranceCategory: FlavorCategory = .nutty
-    
-    // State 2
-    @State private var aromaContrast: AromaContrast = .unsure
-    @State private var aromaIntensity: Double = 6
-    @State private var aromaCategory: FlavorCategory = .nutty
-    
-    // State 3
-    @State private var acidity: Double = 6
-    @State private var sweetness: Double = 6
-    @State private var bitterness: Double = 6
-    @State private var bodyScore: Double = 6
-    @State private var tasteCategory: FlavorCategory = .fruity
-    
-    @State private var scrollToTopNonce: Int = 0
-    
+
     var body: some View {
+        @Bindable var viewModel = viewModel
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: 32) {
                     Color.clear
                         .frame(height: 1)
                         .id("top")
-                    
+
                     header
                     
-                    switch step {
+                    switch viewModel.step {
                     case .fragrance:
                         FragranceStepView(
-                            intensity: $fragranceIntensity,
-                            category: $fragranceCategory
+                            intensity: $viewModel.fragranceIntensity,
+                            category: $viewModel.fragranceCategory
                         )
-                        .onAppear {
-                            if aromaCategory == .nutty { aromaCategory = fragranceCategory }
-                        }
+                        .onAppear { viewModel.onFragranceStepAppear() }
                     case .aroma:
                         AromaStepView(
-                            dryCategory: fragranceCategory,
-                            contrast: $aromaContrast,
-                            wetCategory: $aromaCategory,
-                            wetIntensity: $aromaIntensity
+                            dryCategory: viewModel.fragranceCategory,
+                            contrast: $viewModel.aromaContrast,
+                            wetCategory: $viewModel.aromaCategory,
+                            wetIntensity: $viewModel.aromaIntensity
                         )
-                        .onAppear {
-                            if aromaContrast == .same { aromaCategory = fragranceCategory }
-                        }
+                        .onAppear { viewModel.onAromaStepAppear() }
                     case .taste:
                         TasteStepView(
-                            roastLevel: roastLevel,
-                            processLevel: processLevel,
-                            acidity: $acidity,
-                            sweetness: $sweetness,
-                            bitterness: $bitterness,
-                            bodyScore: $bodyScore,
-                            category: $tasteCategory
+                            roastLevel: viewModel.roastLevel,
+                            processLevel: viewModel.processLevel,
+                            acidity: $viewModel.acidity,
+                            sweetness: $viewModel.sweetness,
+                            bitterness: $viewModel.bitterness,
+                            bodyScore: $viewModel.bodyScore,
+                            category: $viewModel.tasteCategory
                         )
                     }
-                    
+
                     footer
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .onChange(of: scrollToTopNonce) { _, _ in
+            .onChange(of: viewModel.scrollToTopNonce) { _, _ in
                 withAnimation(.easeInOut(duration: 0.25)) {
                     proxy.scrollTo("top", anchor: .top)
                 }
@@ -114,7 +77,7 @@ struct SensoryInputView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    goBackOrDismiss()
+                    if !viewModel.goBack() { dismiss() }
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.headline)
@@ -123,23 +86,23 @@ struct SensoryInputView: View {
             }
         }
     }
-    
+
     private var header: some View {
         VStack(spacing: 10) {
-            Text(step.title)
+            Text(viewModel.step.title)
                 .font(.title2.bold())
-            Text(step.subtitle)
+            Text(viewModel.step.subtitle)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-            
-            StepIndicator(current: step)
+
+            StepIndicator(current: viewModel.step)
                 .padding(.top, 4)
-            
+
             SessionMetaRow(
-                beanName: beanName,
-                beanOrigin: beanOrigin,
-                roastLevel: roastLevel,
-                processLevel: processLevel
+                beanName: viewModel.beanName,
+                beanOrigin: viewModel.beanOrigin,
+                roastLevel: viewModel.roastLevel,
+                processLevel: viewModel.processLevel
             )
                 .padding(.top, 4)
         }
@@ -147,28 +110,13 @@ struct SensoryInputView: View {
         .padding(.top)
         .padding(.horizontal)
     }
-    
+
     private var footer: some View {
         VStack(spacing: 12) {
-            if step == .taste {
+            if viewModel.step == .taste {
                 NavigationLink(
                     destination: ResultView(
-                        evaluation: SensoryEvaluation(
-                            beanName: beanName,
-                            beanOrigin: beanOrigin,
-                            roastLevel: roastLevel,
-                            processLevel: processLevel,
-                            fragranceIntensity: fragranceIntensity,
-                            fragranceCategory: fragranceCategory,
-                            aromaContrast: aromaContrast,
-                            aromaIntensity: aromaIntensity,
-                            aromaCategory: aromaContrast == .same ? fragranceCategory : aromaCategory,
-                            acidity: acidity,
-                            sweetness: sweetness,
-                            bitterness: bitterness,
-                            bodyScore: bodyScore,
-                            tasteCategory: tasteCategory
-                        )
+                        evaluation: viewModel.makeEvaluation()
                     )
                 ) {
                     Text("Lanjut")
@@ -182,7 +130,7 @@ struct SensoryInputView: View {
                 .padding(.horizontal)
             } else {
                 Button {
-                    goNext()
+                    viewModel.goNext()
                 } label: {
                     Text("Lanjut")
                         .font(.headline)
@@ -196,33 +144,6 @@ struct SensoryInputView: View {
             }
         }
     }
-    
-    private func goNext() {
-        switch step {
-        case .fragrance:
-            step = .aroma
-            scrollToTopNonce += 1
-        case .aroma:
-            step = .taste
-            scrollToTopNonce += 1
-        case .taste:
-            break
-        }
-    }
-    
-    private func goBackOrDismiss() {
-        switch step {
-        case .fragrance:
-            dismiss()
-        case .aroma:
-            step = .fragrance
-            scrollToTopNonce += 1
-        case .taste:
-            step = .aroma
-            scrollToTopNonce += 1
-        }
-    }
-    
 }
 
 #Preview {
@@ -263,11 +184,11 @@ private struct SessionMetaRow: View {
 }
 
 private struct StepIndicator: View {
-    let current: SensoryInputView.Step
-    
+    let current: SensoryInputStep
+
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(SensoryInputView.Step.allCases, id: \.rawValue) { s in
+            ForEach(SensoryInputStep.allCases, id: \.rawValue) { s in
                 Circle()
                     .fill(s.rawValue <= current.rawValue ? Color.brown : Color.brown.opacity(0.2))
                     .frame(width: 10, height: 10)

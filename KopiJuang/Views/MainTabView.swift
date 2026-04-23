@@ -9,10 +9,10 @@ import SwiftUI
 
 struct MainTabView: View {
     @AppStorage("dashboardResetCounter") private var dashboardResetCounter: Int = 0
-    @State private var selectedTab: Int = 0
+    @State private var viewModel = MainTabViewModel()
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        TabView(selection: $viewModel.selectedTab) {
             DashboardView()
                 .id("dashboard-\(dashboardResetCounter)")
                 .tabItem {
@@ -28,7 +28,7 @@ struct MainTabView: View {
         }
         .accentColor(.brown)
         .onChange(of: dashboardResetCounter) { _, _ in
-            selectedTab = 0
+            viewModel.resetToDashboardTab()
         }
     }
 }
