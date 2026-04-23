@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct SensoryInputView: View {
-    let beansName: String
-    let grindSize: String
-    let packagingNotes: String
+    @Environment(\.dismiss) var dismiss
+    let beanName: String
+    let beanOrigin: String
+    let roastLevel: String
+    let processLevel: String
     
     enum Step: Int, CaseIterable {
         case fragrance = 0
@@ -27,7 +29,7 @@ struct SensoryInputView: View {
         
         var subtitle: String {
             switch self {
-            case .fragrance: return "Nikmati wangi murni dari bubuk kopi sebelum tersentuh air. Ini adalah awal dari perjalanan rasa dan aroma."
+            case .fragrance: return "Nikmati wangi murni dari bubuk kopi sebelum tersentuh air. Ini adalah langkah awal dari perjalanan rasa dan aroma kopimu."
             case .aroma: return "Saksikan momen blooming. Saat air bertemu kopi, aroma karakter utama mulai terbuka"
             case .taste: return "Seruput kopi Anda dengan sedikit udara. Teknik menyeruput membantu menyebarkan kopi ke seluruh palet mulut dan mengalirkan aroma ke rongga hidung bagian dalam (retronasal), sehingga rasa kopi terasa lebih utuh."
             }
@@ -46,53 +48,78 @@ struct SensoryInputView: View {
     @State private var aromaCategory: FlavorCategory = .nutty
     
     // State 3
-    @State private var acidity: Double = 2
-    @State private var sweetness: Double = 2
-    @State private var mouthfeel: Double = 2
-    @State private var aftertaste: Double = 2
-    @State private var aftertasteDuration: Double = 3
+    @State private var acidity: Double = 6
+    @State private var sweetness: Double = 6
+    @State private var mouthfeel: Double = 6
+    @State private var aftertaste: Double = 6
+    @State private var aftertasteDuration: Double = 6
+    
+    @State private var scrollToTopNonce: Int = 0
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 32) {
-                    header
-                    
-                    switch step {
-                    case .fragrance:
-                        FragranceStepView(
-                            intensity: $fragranceIntensity,
-                            category: $fragranceCategory
-                        )
-                        .onAppear {
-                            if aromaCategory == .nutty { aromaCategory = fragranceCategory }
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 32) {
+                        Color.clear
+                            .frame(height: 1)
+                            .id("top")
+                        
+                        header
+                        
+                        switch step {
+                        case .fragrance:
+                            FragranceStepView(
+                                intensity: $fragranceIntensity,
+                                category: $fragranceCategory
+                            )
+                            .onAppear {
+                                if aromaCategory == .nutty { aromaCategory = fragranceCategory }
+                            }
+                        case .aroma:
+                            AromaStepView(
+                                dryCategory: fragranceCategory,
+                                dryIntensity: fragranceIntensity,
+                                contrast: $aromaContrast,
+                                wetCategory: $aromaCategory,
+                                wetIntensity: $aromaIntensity
+                            )
+                            .onAppear {
+                                if aromaContrast == .same { aromaCategory = fragranceCategory }
+                            }
+                        case .taste:
+                            TasteStepView(
+                                acidity: $acidity,
+                                sweetness: $sweetness,
+                                mouthfeel: $mouthfeel,
+                                aftertaste: $aftertaste,
+                                aftertasteDuration: $aftertasteDuration
+                            )
                         }
-                    case .aroma:
-                        AromaStepView(
-                            dryCategory: fragranceCategory,
-                            dryIntensity: fragranceIntensity,
-                            contrast: $aromaContrast,
-                            wetCategory: $aromaCategory,
-                            wetIntensity: $aromaIntensity
-                        )
-                        .onAppear {
-                            if aromaContrast == .same { aromaCategory = fragranceCategory }
-                        }
-                    case .taste:
-                        TasteStepView(
-                            acidity: $acidity,
-                            sweetness: $sweetness,
-                            mouthfeel: $mouthfeel,
-                            aftertaste: $aftertaste,
-                            aftertasteDuration: $aftertasteDuration
-                        )
+                        
+                        footer
                     }
-                    
-                    footer
+                }
+                .onChange(of: scrollToTopNonce) { _ in
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        proxy.scrollTo("top", anchor: .top)
+                    }
                 }
             }
             .navigationTitle("Sensory")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        goBackOrDismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.headline)
+                    }
+                    .tint(.brown)
+                }
+            }
         }
     }
     
@@ -107,7 +134,7 @@ struct SensoryInputView: View {
             StepIndicator(current: step)
                 .padding(.top, 4)
             
-            SessionMetaRow(beansName: beansName, grindSize: grindSize)
+            SessionMetaRow(beanName: beanName, beanOrigin: beanOrigin)
                 .padding(.top, 4)
         }
         .multilineTextAlignment(.center)
@@ -121,9 +148,10 @@ struct SensoryInputView: View {
                 NavigationLink(
                     destination: ResultView(
                         evaluation: SensoryEvaluation(
-                            beansName: beansName,
-                            grindSize: grindSize,
-                            packagingNotes: packagingNotes,
+                            beanName: beanName,
+                            beanOrigin: beanOrigin,
+                            roastLevel: roastLevel,
+                            processLevel: processLevel,
                             fragranceIntensity: fragranceIntensity,
                             fragranceCategory: fragranceCategory,
                             aromaContrast: aromaContrast,
@@ -167,29 +195,44 @@ struct SensoryInputView: View {
         switch step {
         case .fragrance:
             step = .aroma
+            scrollToTopNonce += 1
         case .aroma:
             step = .taste
+            scrollToTopNonce += 1
         case .taste:
             break
+        }
+    }
+    
+    private func goBackOrDismiss() {
+        switch step {
+        case .fragrance:
+            dismiss()
+        case .aroma:
+            step = .fragrance
+            scrollToTopNonce += 1
+        case .taste:
+            step = .aroma
+            scrollToTopNonce += 1
         }
     }
     
 }
 
 #Preview {
-    SensoryInputView(beansName: "Ethiopia", grindSize: "Medium", packagingNotes: "")
+    SensoryInputView(beanName: "Ethiopia", beanOrigin: "Ethiopia", roastLevel: "Medium", processLevel: "Natural")
 }
 
 private struct SessionMetaRow: View {
-    let beansName: String
-    let grindSize: String
+    let beanName: String
+    let beanOrigin: String
     
     var body: some View {
         HStack(spacing: 8) {
-            Label(beansName, systemImage: "cup.and.saucer.fill")
+            Label(beanName, systemImage: "cup.and.saucer.fill")
             Text("•")
                 .foregroundStyle(.secondary)
-            Label(grindSize, systemImage: "circle.grid.2x1.fill")
+            Label(beanOrigin, systemImage: "circle.grid.2x1.fill")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -429,9 +472,6 @@ private struct ContrastPill: View {
             Text(category.rawValue)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.brown)
-            Text("Intensity \(Int(intensity))/10")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
@@ -466,9 +506,9 @@ private struct TasteStepView: View {
                     subtitle: "Rasa segar/cerah. Cari yang bersih & seimbang.",
                     detail: "Bukan “asam” yang bikin perih. Ini sensasi seperti sitrus/apel yang bikin kopi terasa hidup. Dalam cupping (SCA/WCR), acidity bagus terasa jelas tapi rapi.",
                     value: $acidity,
-                    range: 1...4,
+                    range: 1...10,
                     step: 1,
-                    maxLabel: "/ 4",
+                    maxLabel: "/ 10",
                     lowText: "Flat",
                     highText: "Bright"
                 )
@@ -478,9 +518,9 @@ private struct TasteStepView: View {
                     subtitle: "Manis alami yang bikin rasa “round”.",
                     detail: "Bukan gula. Sweetness di cupping sering terasa sebagai roundness yang merapikan acidity. Fokus: manis jelas, tidak getir/harsh.",
                     value: $sweetness,
-                    range: 1...4,
+                    range: 1...10,
                     step: 1,
-                    maxLabel: "/ 4",
+                    maxLabel: "/ 10",
                     lowText: "Kering",
                     highText: "Round"
                 )
@@ -490,9 +530,9 @@ private struct TasteStepView: View {
                     subtitle: "Tekstur di mulut (tea-like → syrupy).",
                     detail: "Body itu mouthfeel, bukan rasa. Skor tinggi tidak selalu lebih enak; yang dicari nyaman dan sesuai profil.",
                     value: $mouthfeel,
-                    range: 1...4,
+                    range: 1...10,
                     step: 1,
-                    maxLabel: "/ 4",
+                    maxLabel: "/ 10",
                     lowText: "Tea-like",
                     highText: "Syrupy"
                 )
@@ -502,9 +542,9 @@ private struct TasteStepView: View {
                     subtitle: "Kualitas finish: bersih, manis, konsisten.",
                     detail: "Bukan sekadar “lama”. Setelah ditelan, rasa sisa yang bagus terasa bersih dan menyenangkan—bukan ashy/harsh/pahit menggantung.",
                     value: $aftertaste,
-                    range: 1...4,
+                    range: 1...10,
                     step: 1,
-                    maxLabel: "/ 4",
+                    maxLabel: "/ 10",
                     lowText: "Kotor",
                     highText: "Bersih"
                 )
@@ -514,9 +554,9 @@ private struct TasteStepView: View {
                     subtitle: "Seberapa lama finish tertinggal.",
                     detail: "Finish yang lama biasanya terasa persisten dan menyenangkan. Kalau lama tapi pahit/ashy, itu bukan poin plus.",
                     value: $aftertasteDuration,
-                    range: 1...5,
+                    range: 1...10,
                     step: 1,
-                    maxLabel: "/ 5",
+                    maxLabel: "/ 10",
                     lowText: "Cepat hilang",
                     highText: "Persisten"
                 )
@@ -564,10 +604,6 @@ private struct MetricSlider: View {
             HStack {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                Spacer()
-                Text("\(Int(value)) \(maxLabel)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
             
             Slider(value: $value, in: range, step: step)
@@ -653,16 +689,13 @@ private struct MetricScale: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Spacer()
-                Text("\(Int(value)) \(maxLabel)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-            }
-            
-            Slider(value: $value, in: range, step: step)
-                .tint(.brown)
-                .softHapticOnChange(Int(value))
+            SmoothDiscreteSlider(
+                value: $value,
+                range: range,
+                step: step
+            )
+            .frame(height: 44)
+            .softHapticOnChange(Int(value))
             
             HStack {
                 Text(lowText).font(.caption2)
@@ -671,6 +704,80 @@ private struct MetricScale: View {
             }
             .foregroundStyle(.secondary)
         }
+    }
+}
+
+private struct SmoothDiscreteSlider: View {
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let step: Double
+    
+    private var stepsCount: Int {
+        Int(((range.upperBound - range.lowerBound) / step).rounded(.down))
+    }
+    
+    var body: some View {
+        GeometryReader { geo in
+            let width = geo.size.width
+            let height = geo.size.height
+            let thumbSize: CGFloat = 28
+            let trackHeight: CGFloat = 8
+            let trackXStart = thumbSize / 2
+            let trackXEnd = width - thumbSize / 2
+            let trackWidth = max(1, trackXEnd - trackXStart)
+            
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: trackHeight / 2)
+                    .fill(Color(.systemGray5))
+                    .frame(height: trackHeight)
+                    .position(x: width / 2, y: height / 2)
+                
+                RoundedRectangle(cornerRadius: trackHeight / 2)
+                    .fill(Color.brown)
+                    .frame(width: filledWidth(trackWidth: trackWidth), height: trackHeight)
+                    .position(x: trackXStart + filledWidth(trackWidth: trackWidth) / 2, y: height / 2)
+                
+                Circle()
+                    .fill(Color(.systemBackground))
+                    .overlay(
+                        Circle().stroke(Color.brown.opacity(0.35), lineWidth: 2)
+                    )
+                    .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+                    .frame(width: thumbSize, height: thumbSize)
+                    .position(x: thumbX(trackWidth: trackWidth, trackXStart: trackXStart), y: height / 2)
+            }
+            .contentShape(Rectangle())
+            .highPriorityGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { gesture in
+                        let x = clamp(gesture.location.x, min: trackXStart, max: trackXEnd)
+                        let ratio = (x - trackXStart) / trackWidth
+                        let raw = range.lowerBound + ratio * (range.upperBound - range.lowerBound)
+                        value = snapped(raw)
+                    }
+            )
+        }
+    }
+    
+    private func snapped(_ raw: Double) -> Double {
+        guard step > 0 else { return clamp(raw, min: range.lowerBound, max: range.upperBound) }
+        let normalized = (raw - range.lowerBound) / step
+        let rounded = normalized.rounded()
+        let snapped = range.lowerBound + rounded * step
+        return clamp(snapped, min: range.lowerBound, max: range.upperBound)
+    }
+    
+    private func filledWidth(trackWidth: CGFloat) -> CGFloat {
+        let ratio = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
+        return clamp(CGFloat(ratio) * trackWidth, min: 0, max: trackWidth)
+    }
+    
+    private func thumbX(trackWidth: CGFloat, trackXStart: CGFloat) -> CGFloat {
+        trackXStart + filledWidth(trackWidth: trackWidth)
+    }
+    
+    private func clamp<T: Comparable>(_ x: T, min: T, max: T) -> T {
+        Swift.min(Swift.max(x, min), max)
     }
 }
 

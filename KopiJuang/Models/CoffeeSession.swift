@@ -7,6 +7,7 @@
 
 import Foundation
 
+// this model for history coffees
 struct CoffeeSession: Identifiable {
     let id = UUID()
     let title: String

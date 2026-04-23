@@ -23,9 +23,9 @@ struct ResultView: View {
             VStack(spacing: 24) {
                 // 0. Session Meta
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(evaluation.beansName)
+                    Text(evaluation.beanName)
                         .font(.title2.bold())
-                    Text("Grind: \(evaluation.grindSize)")
+                    Text("Roast Level: \(evaluation.roastLevel)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -50,17 +50,17 @@ struct ResultView: View {
                         .foregroundStyle(.secondary)
                     
                     VStack(spacing: 12) {
-                        SensoryBar(label: "Asam", value: evaluation.acidity, max: 4)
-                        SensoryBar(label: "Manis", value: evaluation.sweetness, max: 4)
-                        SensoryBar(label: "Kekentalan", value: evaluation.mouthfeel, max: 4)
-                        SensoryBar(label: "Aftertaste", value: evaluation.aftertaste, max: 4)
+                        SensoryBar(label: "Asam", value: evaluation.acidity, max: 10)
+                        SensoryBar(label: "Manis", value: evaluation.sweetness, max: 10)
+                        SensoryBar(label: "Kekentalan", value: evaluation.mouthfeel, max: 10)
+                        SensoryBar(label: "Aftertaste", value: evaluation.aftertaste, max: 10)
                     }
                     
                     HStack {
                         Text("Aftertaste Duration")
                             .font(.subheadline.weight(.semibold))
                         Spacer()
-                        Text("\(Int(evaluation.aftertasteDuration)) / 5")
+                        Text("\(Int(evaluation.aftertasteDuration)) / 10")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.brown)
                     }
@@ -73,10 +73,10 @@ struct ResultView: View {
 
                 // 2. Question Section
                 VStack(spacing: 16) {
-                    Text("Kategori dominan apa yang paling kamu rasakan saat diseruput?")
+                    Text("Rasa apa yang paling dominan kamu rasakan saat minum?")
                         .font(.title3.bold())
                     
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                         ForEach(FlavorCategory.allCases, id: \.self) { category in
                             CategoryButton(category: category) {
                                 checkAnswer(category)
@@ -146,7 +146,7 @@ struct CategoryButton: View {
                 Text(category.rawValue)
                     .font(.subheadline.bold())
                 Text(descriptionForCategory(category))
-                    .font(.caption)
+                    .font(.subheadline.bold())
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
                     .lineLimit(3)
@@ -227,9 +227,10 @@ struct FeedbackView: View {
     NavigationStack {
         ResultView(
             evaluation: SensoryEvaluation(
-                beansName: "Ethiopia Yirgacheffe",
-                grindSize: "Medium",
-                packagingNotes: "",
+                beanName: "Ethiopia Yirgacheffe",
+                beanOrigin: "Ethiopia",
+                roastLevel: "medium",
+                processLevel: "light",
                 fragranceIntensity: 7,
                 fragranceCategory: .nutty,
                 aromaContrast: .changed,

@@ -11,9 +11,8 @@ struct DashboardView: View {
     @State private var showGuide = false
     
     let sessions: [CoffeeSession] = [
-        CoffeeSession(title: "Ethiopia Yirgacheffe", flavor: "Fruity", isCompleted: true),
-        CoffeeSession(title: "Sumatra Mandheling", flavor: "Earthy", isCompleted: true),
-        CoffeeSession(title: "Java Frinsa", flavor: "Floral", isCompleted: false)
+        CoffeeSession(title: "Kopi Gayo", flavor: "Fruity", isCompleted: true),
+        CoffeeSession(title: "Sumatra Mandailing", flavor: "Earthy", isCompleted: true),
     ]
     
     var body: some View {
@@ -32,32 +31,34 @@ struct DashboardView: View {
                         }
                         .padding(.horizontal)
                         
-                        // 2. Pro Tip Card (New!)
+                        // 2. Big Learning Section
+                        SensoryFlowShowcase()
+                            .padding(.horizontal)
+                        
+                        // 3. Quick Tip
                         ProTipCard()
                             .padding(.horizontal)
                         
-                        // 3. History Section
-                        VStack(alignment: .leading, spacing: 20) {
-                            if sessions.contains(where: { !$0.isCompleted }) {
-                                Text("Target Icip")
-                                    .font(.headline)
-                                    .padding(.horizontal)
-                                ForEach(sessions.filter { !$0.isCompleted }) { session in
-                                    SessionRow(session: session)
-                                }
-                            }
-                            
+                        // 4. History Section
+                        VStack(alignment: .leading, spacing: 12) {
                             Text("Riwayat Palate")
                                 .font(.headline)
                                 .padding(.horizontal)
-                            ForEach(sessions.filter { $0.isCompleted }) { session in
-                                SessionRow(session: session)
+                            
+                            if sessions.filter({ $0.isCompleted }).isEmpty {
+                                EmptyHistoryCard()
+                                    .padding(.horizontal)
+                            } else {
+                                ForEach(sessions.filter { $0.isCompleted }) { session in
+                                    SessionRow(session: session)
+                                }
                             }
                         }
                     }
                     .padding(.top)
+                    .padding(.bottom, 90)
                 }
-                .navigationTitle("Palate")
+                .navigationTitle("KopiJuang")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button { showGuide = true } label: {
@@ -66,13 +67,7 @@ struct DashboardView: View {
                         }
                     }
                 }
-            }
-            .sheet(isPresented: $showGuide) {
-                MasterPrepGuideView(isFirstRun: false)
-            }
-            
-            HStack{
-                Spacer()
+                
                 NavigationLink(destination: CoffeeSetupView()) {
                     Image(systemName: "plus")
                         .font(.title2.bold())
@@ -82,9 +77,12 @@ struct DashboardView: View {
                         .clipShape(Circle())
                         .shadow(radius: 5)
                 }
+                .padding(.trailing)
+                .padding(.bottom, 18)
             }
-            .padding(.trailing)
-            
+            .sheet(isPresented: $showGuide) {
+                MasterPrepGuideView(isFirstRun: false)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -127,6 +125,123 @@ struct ProTipCard: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(16)
+    }
+}
+
+private struct SensoryFlowShowcase: View {
+//    let flow: SensoryFlow
+    var body: some View {
+        VStack(alignment: .leading, spacing: -10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Kenali notes kopimu, bertahap")
+                        .font(.headline)
+                    Text("Tiga langkah sederhana yang bikin hidung + lidahmu makin peka.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "sparkles")
+                    .foregroundStyle(.brown)
+            }
+            
+            TabView {
+                FlowPage(
+                    icon: "nose.fill",
+                    title: "Fragrance",
+                    subtitle: "Kopi kering (tanpa air)",
+                    bodyText: "Cium bubuk kopi. Tangkap kategori dominan sebelum air mengubah karakter aromanya."
+                )
+                FlowPage(
+                    icon: "drop.circle.fill",
+                    title: "Aroma",
+                    subtitle: "Kopi basah (bloom)",
+                    bodyText: "Saat air panas masuk, karakter bisa “bergeser”. Catat perubahan—ini insight mahal."
+                )
+                FlowPage(
+                    icon: "mouth.fill",
+                    title: "Taste",
+                    subtitle: "Diseruput + retronasal",
+                    bodyText: "Seruput dengan sedikit udara, lalu hembuskan lewat hidung. Rasa jadi lebih utuh."
+                )
+            }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            .frame(height: 200)
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.brown.opacity(0.08))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.brown.opacity(0.18), lineWidth: 1)
+        )
+    }
+}
+
+private struct FlowPage: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let bodyText: String
+    
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.brown.opacity(0.12))
+                    .frame(width: 54, height: 54)
+                Image(systemName: icon)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.brown)
+            }
+            
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Text(title)
+                        .font(.headline)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(.systemBackground))
+                        .clipShape(Capsule())
+                }
+                Text(bodyText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer(minLength: 0)
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(16)
+    }
+}
+
+private struct EmptyHistoryCard: View {
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .font(.title2)
+                .foregroundStyle(.brown)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Belum ada sesi")
+                    .font(.subheadline.bold())
+                Text("Mulai 1 sesi untuk mulai membangun “palate memory”.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .padding()
         .background(Color(.secondarySystemBackground))
         .cornerRadius(16)
     }

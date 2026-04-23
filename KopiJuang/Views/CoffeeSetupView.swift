@@ -8,28 +8,33 @@
 import SwiftUI
 
 struct CoffeeSetupView: View {
-    @State private var beansName: String = ""
-    @State private var grindSize: String = "Medium"
-    @State private var packagingNotes: String = ""
+    @State private var beanName: String = ""
+    @State private var beanOrigin: String = ""
+    @State private var roastLevel: String = ""
+    @State private var processLevel: String = ""
     
-    let grindOptions = ["Coarse", "Medium", "Fine"]
+    let roastOptions: [String] = ["Light", "Medium", "Dark", "Omni"]
+    let processOptions: [String] = ["Natural", "Wash", "Honey", "Anaerobic", "Wet Hulled"]
     
     var body: some View {
         NavigationStack {
             Form {
                 Section(header: Text("Informasi Beans")) {
-                    TextField("Nama Kopi / Origin", text: $beansName)
+                    TextField("Nama Kopi", text: $beanName)
                     
-                    Picker("Grind Size", selection: $grindSize) {
-                        ForEach(grindOptions, id: \.self) { option in
+                    TextField("Origin", text: $beanOrigin)
+                    
+                    Picker("Roast Level", selection: $roastLevel) {
+                        ForEach(roastOptions, id: \.self) { option in
                             Text(option).tag(option)
                         }
                     }
-                }
-                
-                Section(header: Text("Catatan Kemasan (Optional)")) {
-                    TextEditor(text: $packagingNotes)
-                        .frame(height: 100)
+                    
+                    Picker("Process Level", selection: $processLevel) {
+                        ForEach(processOptions, id: \.self) { option in
+                            Text(option).tag(option)
+                        }
+                    }
                 }
             }
             .navigationTitle("Persiapan Sesi")
@@ -37,9 +42,10 @@ struct CoffeeSetupView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(
                         destination: SensoryInputView(
-                            beansName: beansName,
-                            grindSize: grindSize,
-                            packagingNotes: packagingNotes
+                            beanName: beanName,
+                            beanOrigin: beanOrigin,
+                            roastLevel: roastLevel,
+                            processLevel: processLevel
                         )
                     ) {
                         Label("Mulai", systemImage: "checkmark")
@@ -47,7 +53,7 @@ struct CoffeeSetupView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.brown)
-                    .disabled(beansName.isEmpty)
+                    .disabled(beanName.isEmpty)
                 }
             }
         }

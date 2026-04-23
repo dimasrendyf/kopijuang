@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+// untuk data di halaman atlas
 struct FlavorNote: Identifiable {
     let id = UUID()
     let name: String

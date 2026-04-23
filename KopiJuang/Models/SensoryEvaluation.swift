@@ -18,9 +18,10 @@ enum AromaContrast: String, CaseIterable, Identifiable {
 struct SensoryEvaluation: Identifiable {
     let id = UUID()
     
-    var beansName: String
-    var grindSize: String
-    var packagingNotes: String
+    var beanName: String
+    var beanOrigin: String
+    var roastLevel: String
+    var processLevel: String
     
     // State 1: Fragrance (Dry Coffee)
     var fragranceIntensity: Double // 1...10
@@ -32,9 +33,9 @@ struct SensoryEvaluation: Identifiable {
     var aromaCategory: FlavorCategory
     
     // State 3: Taste (Sip + Retronasal)
-    var acidity: Double // 1...4
-    var sweetness: Double // 1...4
-    var mouthfeel: Double // 1...4
-    var aftertaste: Double // 1...4
-    var aftertasteDuration: Double // 1...5
+    var acidity: Double // 1...10
+    var sweetness: Double // 1...10
+    var mouthfeel: Double // 1...10
+    var aftertaste: Double // 1...10
+    var aftertasteDuration: Double // 1...10
 }
