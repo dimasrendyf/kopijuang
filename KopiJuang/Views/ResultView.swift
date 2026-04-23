@@ -15,6 +15,7 @@ struct ResultView: View {
     @State private var showingFeedback = false
     @State private var isCorrect = false
     @State private var feedbackMessage = ""
+    @State private var selectedCategory: FlavorCategory?
     
     private var correctCategory: FlavorCategory { evaluation.aromaCategory }
 
@@ -25,9 +26,15 @@ struct ResultView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(evaluation.beanName)
                         .font(.title2.bold())
-                    Text("Roast Level: \(evaluation.roastLevel)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    HStack(spacing: 8) {
+                        Text(evaluation.beanOrigin)
+                        Text("•")
+                        Text("Roast \(evaluation.roastLevel)")
+                        Text("•")
+                        Text(evaluation.processLevel)
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
@@ -52,17 +59,8 @@ struct ResultView: View {
                     VStack(spacing: 12) {
                         SensoryBar(label: "Asam", value: evaluation.acidity, max: 10)
                         SensoryBar(label: "Manis", value: evaluation.sweetness, max: 10)
-                        SensoryBar(label: "Kekentalan", value: evaluation.mouthfeel, max: 10)
-                        SensoryBar(label: "Aftertaste", value: evaluation.aftertaste, max: 10)
-                    }
-                    
-                    HStack {
-                        Text("Aftertaste Duration")
-                            .font(.subheadline.weight(.semibold))
-                        Spacer()
-                        Text("\(Int(evaluation.aftertasteDuration)) / 10")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.brown)
+                        SensoryBar(label: "Pahit", value: evaluation.bitterness, max: 10)
+                        SensoryBar(label: "Body", value: evaluation.bodyScore, max: 10)
                     }
                 }
                 .padding(24)
@@ -81,6 +79,13 @@ struct ResultView: View {
                             CategoryButton(category: category) {
                                 checkAnswer(category)
                             }
+                            .overlay(
+                                Image(systemName: selectedCategory == category ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selectedCategory == category ? .brown : .secondary)
+                                    .padding(12),
+                                alignment: .topTrailing
+                            )
                         }
                     }
                 }
@@ -95,6 +100,7 @@ struct ResultView: View {
     }
 
     func checkAnswer(_ category: FlavorCategory) {
+        selectedCategory = category
         if category == correctCategory {
             isCorrect = true
             feedbackMessage = "Tepat sekali! Kamu punya indera perasa yang tajam. Badge \(category.rawValue) berhasil didapatkan!"
@@ -140,24 +146,49 @@ struct CategoryButton: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: iconForCategory(category))
-                    .font(.title2)
-                Text(category.rawValue)
-                    .font(.subheadline.bold())
-                Text(descriptionForCategory(category))
-                    .font(.subheadline.bold())
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(3)
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(accentColor(category).opacity(0.18))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: iconForCategory(category))
+                        .font(.title3.weight(.semibold))
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(category.rawValue)
+                        .font(.headline)
+                    Text(descriptionForCategory(category))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(Color.brown.opacity(0.1))
+            .foregroundStyle(accentColor(category))
+            .padding(.vertical, 14)
+            .padding(.horizontal, 14)
+            .background(
+                LinearGradient(
+                    colors: [accentColor(category).opacity(0.16), accentColor(category).opacity(0.06)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .cornerRadius(16)
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.brown.opacity(0.3), lineWidth: 1))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(accentColor(category).opacity(0.35), lineWidth: 1)
+            )
         }
-        .foregroundStyle(.brown)
+    }
+    
+    private func accentColor(_ cat: FlavorCategory) -> Color {
+        switch cat {
+        case .floral: return .teal
+        case .fruity: return .orange
+        case .nutty: return .brown
+        case .sweet: return .pink
+        }
     }
     
     func iconForCategory(_ cat: FlavorCategory) -> String {
@@ -172,13 +203,13 @@ struct CategoryButton: View {
     func descriptionForCategory(_ cat: FlavorCategory) -> String {
         switch cat {
         case .floral:
-            return "Aroma bunga/teh via retronasal (jasmine, black tea)."
+            return "Nuansa bunga/teh lewat aroma retronasal."
         case .fruity:
-            return "Buah + acidity rapi (citrus, berry)."
+            return "Karakter buah yang fresh dan cerah."
         case .nutty:
-            return "Kacang/cocoa “brown” hangat (almond, cocoa)."
+            return "Kacang/cokelat hangat yang membumi."
         case .sweet:
-            return "Manis sebagai roundness (honey, vanilla, caramel)."
+            return "Manis alami yang bikin cup terasa round."
         }
     }
 }
@@ -229,8 +260,8 @@ struct FeedbackView: View {
             evaluation: SensoryEvaluation(
                 beanName: "Ethiopia Yirgacheffe",
                 beanOrigin: "Ethiopia",
-                roastLevel: "medium",
-                processLevel: "light",
+                roastLevel: "Medium",
+                processLevel: "Natural",
                 fragranceIntensity: 7,
                 fragranceCategory: .nutty,
                 aromaContrast: .changed,
@@ -238,9 +269,8 @@ struct FeedbackView: View {
                 aromaCategory: .fruity,
                 acidity: 3,
                 sweetness: 2,
-                mouthfeel: 3,
-                aftertaste: 3,
-                aftertasteDuration: 4
+                bitterness: 4,
+                bodyScore: 6
             )
         )
     }

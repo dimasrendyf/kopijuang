@@ -10,52 +10,67 @@ import SwiftUI
 struct CoffeeSetupView: View {
     @State private var beanName: String = ""
     @State private var beanOrigin: String = ""
-    @State private var roastLevel: String = ""
-    @State private var processLevel: String = ""
+    @State private var roastLevel: String = "" // Jangan isi default
+    @State private var processLevel: String = "" // Jangan isi default
     
     let roastOptions: [String] = ["Light", "Medium", "Dark", "Omni"]
     let processOptions: [String] = ["Natural", "Wash", "Honey", "Anaerobic", "Wet Hulled"]
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text("Informasi Beans")) {
-                    TextField("Nama Kopi", text: $beanName)
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Siapkan Cangkirmu")
+                            .font(.title.bold())
+                        
+                        Text("Ceritakan sedikit tentang kopi ini. Kami akan memandu indramu untuk menemukan rasa tersembunyi di dalamnya.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 10)
+                }
+                .listRowBackground(Color.clear)
+                
+                Section("Detail Beans") {
+                    LabeledTextField(icon: "leaf.fill", placeholder: "Nama Kopi (contoh: Gayo)", text: $beanName)
+                    LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $beanOrigin)
                     
-                    TextField("Origin", text: $beanOrigin)
-                    
+                    // FIX PICKER: Tambahkan tag kosong
                     Picker("Roast Level", selection: $roastLevel) {
-                        ForEach(roastOptions, id: \.self) { option in
-                            Text(option).tag(option)
-                        }
+                        Text("Pilih Level...").tag("")
+                        ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
                     }
                     
-                    Picker("Process Level", selection: $processLevel) {
-                        ForEach(processOptions, id: \.self) { option in
-                            Text(option).tag(option)
-                        }
+                    Picker("Process", selection: $processLevel) {
+                        Text("Pilih Proses...").tag("")
+                        ForEach(processOptions, id: \.self) { Text($0).tag($0) }
                     }
                 }
             }
-            .navigationTitle("Persiapan Sesi")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(
-                        destination: SensoryInputView(
-                            beanName: beanName,
-                            beanOrigin: beanOrigin,
-                            roastLevel: roastLevel,
-                            processLevel: processLevel
-                        )
-                    ) {
-                        Label("Mulai", systemImage: "checkmark")
-                            .bold()
+                    NavigationLink(destination: SensoryInputView(beanName: beanName, beanOrigin: beanOrigin, roastLevel: roastLevel, processLevel: processLevel)) {
+                        Label("Mulai", systemImage: "checkmark").bold()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.brown)
-                    .disabled(beanName.isEmpty)
+                    .disabled(beanName.isEmpty || roastLevel.isEmpty || processLevel.isEmpty)
                 }
             }
+        }
+    }
+}
+
+struct LabeledTextField: View {
+    let icon: String
+    let placeholder: String
+    @Binding var text: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundStyle(.brown)
+            TextField(placeholder, text: $text)
         }
     }
 }

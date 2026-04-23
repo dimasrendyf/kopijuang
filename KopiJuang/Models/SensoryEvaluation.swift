@@ -35,7 +35,6 @@ struct SensoryEvaluation: Identifiable {
     // State 3: Taste (Sip + Retronasal)
     var acidity: Double // 1...10
     var sweetness: Double // 1...10
-    var mouthfeel: Double // 1...10
-    var aftertaste: Double // 1...10
-    var aftertasteDuration: Double // 1...10
+    var bitterness: Double // 1...10
+    var bodyScore: Double // 1...10
 }

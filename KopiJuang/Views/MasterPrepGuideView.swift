@@ -48,19 +48,21 @@ struct MasterPrepGuideView: View {
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
                 
-                Button(action: {
-                    hasCompletedFirstSession = true
-                }) {
-                    Text("Rasain Kopimu")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.brown)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                if isFirstRun {
+                    Button(action: {
+                        hasCompletedFirstSession = true
+                    }) {
+                        Text("Rasain Kopimu")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brown)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
             }
             .navigationTitle("Tips Barista")
             .navigationBarTitleDisplayMode(.inline)
