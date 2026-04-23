@@ -74,6 +74,26 @@ struct ResultView: View {
                 .cornerRadius(24)
                 .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
                 .padding(.horizontal)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Saran Untuk Seduhan Besok")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(brewTipInsight)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    
+                    Text(brewTipAction)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+                .background(Color(.systemBackground))
+                .cornerRadius(18)
+                .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 4)
+                .padding(.horizontal)
 
                 // 2. Question Section
                 VStack(spacing: 16) {
@@ -149,6 +169,46 @@ struct ResultView: View {
         }
     }
 
+    private var brewTipInsight: String {
+        let roast = evaluation.roastLevel.lowercased()
+        let process = evaluation.processLevel.lowercased()
+        
+        if evaluation.bitterness >= 8 && roast == "dark" {
+            return "Pahit dominan kemungkinan dari profil roast + ekstraksi."
+        }
+        if evaluation.acidity >= 8 && roast == "light" {
+            return "Keasaman terasa cukup agresif untuk profil light roast."
+        }
+        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
+            return "Manis alami dari process belum keluar maksimal."
+        }
+        if evaluation.bodyScore <= 4 {
+            return "Body terasa tipis, kemungkinan ekstraksi masih kurang."
+        }
+        
+        return "Cup kamu sudah cukup seimbang untuk parameter saat ini."
+    }
+    
+    private var brewTipAction: String {
+        let roast = evaluation.roastLevel.lowercased()
+        let process = evaluation.processLevel.lowercased()
+        
+        if evaluation.bitterness >= 8 && roast == "dark" {
+            return "Coba turunkan suhu ke 88-90C atau percepat waktu seduh."
+        }
+        if evaluation.acidity >= 8 && roast == "light" {
+            return "Coba gilingan sedikit lebih halus agar ekstraksi lebih seimbang."
+        }
+        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
+            return "Coba rasio sedikit lebih pekat atau naikkan suhu 1-2C."
+        }
+        if evaluation.bodyScore <= 4 {
+            return "Coba grind sedikit lebih halus atau tambah waktu kontak 10-15 detik."
+        }
+        
+        return "Pertahankan resep ini lalu ubah 1 variabel kecil saja di sesi berikutnya."
+    }
+    
     func checkAnswer(_ category: FlavorCategory) {
         selectedCategory = category
         isCorrect = true

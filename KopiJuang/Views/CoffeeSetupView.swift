@@ -59,6 +59,35 @@ struct CoffeeSetupView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            
+            if !roastLevel.isEmpty && !processLevel.isEmpty {
+                Section("Prediksi Karakter Cangkir") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Insight Roast", systemImage: "flame.fill")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.brown)
+                        Text(roastDescription(for: roastLevel))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Divider()
+                        
+                        Label("Insight Process", systemImage: "drop.fill")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.brown)
+                        Text(processDescription(for: processLevel))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Divider()
+                        
+                        Text("Fokus rasa awal: \(focusHint(roast: roastLevel, process: processLevel))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.brown)
+                    }
+                    .padding(.vertical, 6)
+                }
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -88,6 +117,23 @@ struct CoffeeSetupView: View {
         case "Anaerobic": return "Notes eksotik, seringkali ada karakter fermentasi/winey."
         case "Wet Hulled": return "Body sangat tebal, acidity rendah, notes earthy/spicy khas Indonesia."
         default: return ""
+        }
+    }
+    
+    func focusHint(roast: String, process: String) -> String {
+        switch (roast.lowercased(), process.lowercased()) {
+        case ("light", "natural"):
+            return "cek acidity cerah + sweetness fruity."
+        case ("light", "wash"), ("light", "washed"):
+            return "cek kejernihan acidity dan clean finish."
+        case ("dark", _):
+            return "cek body, bitterness, dan ketebalan aftertaste."
+        case (_, "honey"):
+            return "cek sweetness round dan mouthfeel nyaman."
+        case (_, "wet hulled"):
+            return "cek body tebal dan earthy note."
+        default:
+            return "cek keseimbangan acidity, sweetness, bitterness, dan body."
         }
     }
 }

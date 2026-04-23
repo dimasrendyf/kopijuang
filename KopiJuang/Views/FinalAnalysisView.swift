@@ -4,8 +4,10 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct FinalAnalysisView: View {
+    @Query private var userProgresses: [UserProgress]
     let evaluation: SensoryEvaluation
     let primaryCategory: FlavorCategory
     let selectedNode: FlavorWheelNode?
@@ -59,6 +61,27 @@ struct FinalAnalysisView: View {
         }
         return "Cup kamu sudah cukup balance. Besok ubah satu variabel kecil saja (rasio/suhu/grind) agar progres belajar terasa jelas."
     }
+    
+    private var selectedNoteExperienceCount: Int {
+        guard let selectedNode else { return 0 }
+        let experienced = userProgresses.flatMap(\.experiencedNotes)
+        return experienced.filter { $0 == selectedNode.name }.count
+    }
+    
+    private var familiarityLevel: String {
+        switch selectedNoteExperienceCount {
+        case 0:
+            return "Pemula"
+        case 1...2:
+            return "Pemula"
+        case 3...5:
+            return "Kenal"
+        case 6...9:
+            return "Akrab"
+        default:
+            return "Peka"
+        }
+    }
 
     var body: some View {
         ScrollView {
@@ -101,6 +124,27 @@ struct FinalAnalysisView: View {
                     Text(brewGuidance)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                }
+                
+                FinalCard(title: "Progress Familiarity") {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Level saat ini: \(familiarityLevel)")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.brown)
+                        if let specificNote {
+                            Text("Note \(specificNote) sudah kamu rasakan \(selectedNoteExperienceCount)x.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        } else if let secondaryNote {
+                            Text("Note \(secondaryNote) sudah kamu rasakan \(selectedNoteExperienceCount)x.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text("Terus ulangi sesi di kategori ini agar familiarity naik bertahap.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
 
                 Button {

@@ -16,8 +16,6 @@ struct CascadingQuizView: View {
     let parentNodeId: String
     
     @State private var parentNode: FlavorWheelNode?
-    @State private var showingFeedback = false
-    @State private var isCorrect = false
     @State private var selectedNode: FlavorWheelNode?
     
     // For navigation to specific/final analysis
@@ -30,7 +28,7 @@ struct CascadingQuizView: View {
                 Text("Eksplorasi Rasa \(parent.layer == 1 ? "Secondary" : "Spesifik")")
                     .font(.title2.bold())
                 
-                Text("Kamu memilih \(parent.name). Dari opsi di bawah, mana yang paling mendekati pengalaman rasamu?")
+                Text(transitionPrompt(for: parent))
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
@@ -63,6 +61,32 @@ struct CascadingQuizView: View {
                     }
                 }
                 .padding()
+                
+                VStack(spacing: 10) {
+                    if let selectedNode {
+                        Text("Pilihanmu: \(selectedNode.name).")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Pilih satu opsi yang paling mendekati sensasi kamu.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Button {
+                        continueExploration()
+                    } label: {
+                        Text(parent.children.first(where: { $0.id == selectedNode?.id })?.children.isEmpty == false ? "Lanjut ke Layer Berikutnya" : "Selesai & Lihat Analisis Final")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(selectedNode == nil ? Color.gray.opacity(0.25) : Color.brown)
+                            .foregroundStyle(.white)
+                            .cornerRadius(14)
+                    }
+                    .disabled(selectedNode == nil)
+                }
+                .padding(.horizontal)
             } else {
                 ProgressView()
             }
@@ -71,29 +95,9 @@ struct CascadingQuizView: View {
         }
         .padding(.top)
         .background(Color(.secondarySystemBackground))
-        .navigationTitle(parentNode?.name ?? "Quiz")
+        .navigationTitle(parentNode?.name ?? "Eksplorasi")
         .onAppear {
             parentNode = FlavorWheelNode.findNode(by: parentNodeId)
-        }
-        .sheet(isPresented: $showingFeedback) {
-            FeedbackView(
-                isCorrect: isCorrect,
-                message: isCorrect ? "Tercatat. Semakin sering kamu melatih note ini, semakin tinggi familiarity-mu." : "Coba lagi dan pilih yang paling mendekati sensasi yang kamu rasakan.",
-                category: FlavorCategory(rawValue: parentNode?.name ?? "Fruity") ?? .fruity, // Fallback
-                nextAction: {
-                    showingFeedback = false
-                    if isCorrect {
-                        if selectedNode?.children.isEmpty == false {
-                            // Go to specific
-                            navigateToNext = true
-                        } else {
-                            // Finish and show final analysis
-                            saveSession(completed: true)
-                            navigateToFinalAnalysis = true
-                        }
-                    }
-                }
-            )
         }
         .navigationDestination(isPresented: $navigateToNext) {
             if let selected = selectedNode {
@@ -115,8 +119,28 @@ struct CascadingQuizView: View {
     
     private func handleGuess(_ child: FlavorWheelNode) {
         selectedNode = child
-        // Tahap ini eksploratif, tidak memakai benar/salah.
-        isCorrect = true
+    }
+    
+    private func continueExploration() {
+        guard let node = selectedNode else { return }
+        saveExploration(for: node)
+        
+        if node.children.isEmpty {
+            saveSession(completed: true)
+            navigateToFinalAnalysis = true
+        } else {
+            navigateToNext = true
+        }
+    }
+    
+    private func transitionPrompt(for parent: FlavorWheelNode) -> String {
+        if parent.layer == 1 {
+            return "\(parent.name) itu luas. Turunan rasa mana yang paling mendekati rasa kopimu?"
+        }
+        return "Bagus. Sekarang pilih note paling spesifik yang paling terasa dari \(parent.name)."
+    }
+    
+    private func saveExploration(for child: FlavorWheelNode) {
         
         let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
         
@@ -130,14 +154,12 @@ struct CascadingQuizView: View {
             }
         }
         progress.experiencedNotes.append(child.name)
-        progress.totalCorrectGuesses += 1
         
         do {
             try modelContext.save()
         } catch {
             print("Failed saving Cascading guess: \(error.localizedDescription)")
         }
-        showingFeedback = true
     }
     
     private func saveSession(completed: Bool) {
