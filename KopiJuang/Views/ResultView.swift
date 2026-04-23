@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Main View
 struct ResultView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var userProgresses: [UserProgress]
+
     let evaluation: SensoryEvaluation
     
     // State untuk feedback
@@ -17,7 +21,16 @@ struct ResultView: View {
     @State private var feedbackMessage = ""
     @State private var selectedCategory: FlavorCategory?
     
-    private var correctCategory: FlavorCategory { evaluation.aromaCategory }
+    // For navigation
+    @State private var navigateToCascading = false
+    
+    private var correctCategory: FlavorCategory {
+        if evaluation.acidity > 6 && evaluation.sweetness >= 4 { return .fruity }
+        if evaluation.sweetness > 6 && evaluation.bitterness < 5 { return .sweet }
+        if evaluation.bodyScore > 6 && evaluation.bitterness >= 5 { return .nutty }
+        if evaluation.acidity <= 5 && evaluation.bodyScore <= 5 { return .floral }
+        return evaluation.tasteCategory
+    }
 
     var body: some View {
         ScrollView {
@@ -71,8 +84,9 @@ struct ResultView: View {
 
                 // 2. Question Section
                 VStack(spacing: 16) {
-                    Text("Rasa apa yang paling dominan kamu rasakan saat minum?")
+                    Text("Menurut kamu, kategori apa yang paling menggambarkan profil kopi ini secara keseluruhan berdasarkan analismu?")
                         .font(.title3.bold())
+                        .multilineTextAlignment(.center)
                     
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                         ForEach(FlavorCategory.allCases, id: \.self) { category in
@@ -95,7 +109,23 @@ struct ResultView: View {
         .background(Color(.secondarySystemBackground))
         .navigationTitle("Hasil Analisis")
         .sheet(isPresented: $showingFeedback) {
-            FeedbackView(isCorrect: isCorrect, message: feedbackMessage, category: correctCategory)
+            FeedbackView(
+                isCorrect: isCorrect, 
+                message: feedbackMessage, 
+                category: correctCategory,
+                nextAction: isCorrect ? {
+                    showingFeedback = false
+                    // Give sheet time to dismiss before navigating
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        navigateToCascading = true
+                    }
+                } : nil
+            )
+        }
+        .navigationDestination(isPresented: $navigateToCascading) {
+            if let cat = selectedCategory {
+                CascadingQuizView(evaluation: evaluation, parentNodeId: cat.rawValue)
+            }
         }
     }
 
@@ -104,6 +134,18 @@ struct ResultView: View {
         if category == correctCategory {
             isCorrect = true
             feedbackMessage = "Tepat sekali! Kamu punya indera perasa yang tajam. Badge \(category.rawValue) berhasil didapatkan!"
+            
+            // Unlock primary note
+            let progress = userProgresses.first ?? UserProgress()
+            if userProgresses.isEmpty {
+                modelContext.insert(progress)
+            }
+            if !progress.unlockedPrimaryNotes.contains(category.rawValue) {
+                progress.unlockedPrimaryNotes.append(category.rawValue)
+            }
+            progress.totalCorrectGuesses += 1
+            try? modelContext.save()
+            
         } else {
             isCorrect = false
             feedbackMessage = "Hmm, menarik! Tapi sebenarnya profil ini lebih condong ke \(correctCategory.rawValue). Mau coba latihan referensi rasa \(correctCategory.rawValue)?"
@@ -220,6 +262,7 @@ struct FeedbackView: View {
     let isCorrect: Bool
     let message: String
     let category: FlavorCategory
+    var nextAction: (() -> Void)? = nil
 
     var body: some View {
         NavigationStack {
@@ -235,7 +278,20 @@ struct FeedbackView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
 
-                if !isCorrect {
+                if isCorrect {
+                    if let nextAction = nextAction {
+                        Button {
+                            nextAction()
+                        } label: {
+                            Text("Lanjut Tebak Rasa Spesifik")
+                                .bold()
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.brown)
+                        .controlSize(.large)
+                    }
+                } else {
                     NavigationLink(destination: TrainingView(flavor: category.rawValue)) {
                         Text("Ayo Latihan Rasa \(category.rawValue)")
                             .bold()
@@ -254,27 +310,27 @@ struct FeedbackView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        ResultView(
-            evaluation: SensoryEvaluation(
-                beanName: "Ethiopia Yirgacheffe",
-                beanOrigin: "Ethiopia",
-                roastLevel: "Medium",
-                processLevel: "Natural",
-                fragranceIntensity: 7,
-                fragranceCategory: .nutty,
-                aromaContrast: .changed,
-                aromaIntensity: 8,
-                aromaCategory: .fruity,
-                acidity: 3,
-                sweetness: 2,
-                bitterness: 4,
-                bodyScore: 6
-            )
-        )
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        ResultView(
+//            evaluation: SensoryEvaluation(
+//                beanName: "Ethiopia Yirgacheffe",
+//                beanOrigin: "Ethiopia",
+//                roastLevel: "Medium",
+//                processLevel: "Natural",
+//                fragranceIntensity: 7,
+//                fragranceCategory: .nutty,
+//                aromaContrast: .changed,
+//                aromaIntensity: 8,
+//                aromaCategory: .fruity,
+//                acidity: 3,
+//                sweetness: 2,
+//                bitterness: 4,
+//                bodyScore: 6
+//            )
+//        )
+//    }
+//}
 
 private struct FragranceAromaSummaryCard: View {
     let fragranceCategory: FlavorCategory

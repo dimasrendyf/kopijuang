@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
     @State private var showGuide = false
+    @Query private var userProgresses: [UserProgress]
     
-    let sessions: [CoffeeSession] = [
-        CoffeeSession(title: "Kopi Gayo", flavor: "Fruity", isCompleted: true),
-        CoffeeSession(title: "Sumatra Mandailing", flavor: "Earthy", isCompleted: true),
-    ]
+    var completedSessions: [SessionHistory] {
+        return userProgresses.first?.completedSessions.sorted(by: { $0.date > $1.date }) ?? []
+    }
     
     var body: some View {
         NavigationStack {
@@ -45,11 +46,11 @@ struct DashboardView: View {
                                 .font(.headline)
                                 .padding(.horizontal)
                             
-                            if sessions.filter({ $0.isCompleted }).isEmpty {
+                            if completedSessions.isEmpty {
                                 EmptyHistoryCard()
                                     .padding(.horizontal)
                             } else {
-                                ForEach(sessions.filter { $0.isCompleted }) { session in
+                                ForEach(completedSessions) { session in
                                     SessionRow(session: session)
                                 }
                             }
@@ -89,15 +90,15 @@ struct DashboardView: View {
 }
 
 struct SessionRow: View {
-    let session: CoffeeSession
+    let session: SessionHistory
     var body: some View {
         HStack {
-            Image(systemName: session.isCompleted ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(session.isCompleted ? .green : .secondary)
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.green)
             
             VStack(alignment: .leading) {
-                Text(session.title).font(.body.bold())
-                Text(session.flavor).font(.caption).foregroundStyle(.secondary)
+                Text(session.beanName).font(.body.bold())
+                Text(session.finalCategory).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
         }

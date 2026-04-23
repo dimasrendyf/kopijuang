@@ -43,9 +43,21 @@ struct CoffeeSetupView: View {
                         ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
                     }
                     
+                    if !roastLevel.isEmpty {
+                        Text(roastDescription(for: roastLevel))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    
                     Picker("Process", selection: $processLevel) {
                         Text("Pilih Proses...").tag("")
                         ForEach(processOptions, id: \.self) { Text($0).tag($0) }
+                    }
+                    
+                    if !processLevel.isEmpty {
+                        Text(processDescription(for: processLevel))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -57,6 +69,27 @@ struct CoffeeSetupView: View {
                     .disabled(beanName.isEmpty || roastLevel.isEmpty || processLevel.isEmpty)
                 }
             }
+        }
+    }
+    
+    func roastDescription(for level: String) -> String {
+        switch level {
+        case "Light": return "Acidity lebih terbaca, body ringan, notes origin lebih jelas."
+        case "Medium": return "Balance antara acidity dan body."
+        case "Dark": return "Body tebal, bitterness dominan, notes roast (cokelat, smoky)."
+        case "Omni": return "Fleksibel untuk filter maupun espresso."
+        default: return ""
+        }
+    }
+    
+    func processDescription(for process: String) -> String {
+        switch process {
+        case "Natural": return "Cenderung fruity, body lebih tebal, sweetness tinggi."
+        case "Wash": return "Clean, acidity lebih jelas, notes lebih defined."
+        case "Honey": return "Di antara natural dan washed, sweetness menonjol."
+        case "Anaerobic": return "Notes eksotik, seringkali ada karakter fermentasi/winey."
+        case "Wet Hulled": return "Body sangat tebal, acidity rendah, notes earthy/spicy khas Indonesia."
+        default: return ""
         }
     }
 }

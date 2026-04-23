@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct KopiJuangApp: App {
@@ -19,5 +20,6 @@ struct KopiJuangApp: App {
                 ContentView()  // belum pernah onboarding
             }
         }
+        .modelContainer(for: [UserProgress.self, SessionHistory.self, UserBadge.self])
     }
 }

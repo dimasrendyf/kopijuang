@@ -37,4 +37,5 @@ struct SensoryEvaluation: Identifiable {
     var sweetness: Double // 1...10
     var bitterness: Double // 1...10
     var bodyScore: Double // 1...10
+    var tasteCategory: FlavorCategory // Dominan rasa saat taste
 }

@@ -65,18 +65,37 @@ struct TrainingView: View {
 
                 Spacer()
                 
-                // 4. Action Button (Full-width CTA)
-                Button("Oke, aku sudah coba!") {
-                    dismiss()
+                // 4. Action Buttons (Full-width CTA)
+                VStack(spacing: 12) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Coba tebak lagi")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brown)
+                            .foregroundStyle(.white)
+                            .cornerRadius(12)
+                    }
+                    
+                    Button {
+                        NavigationUtil.popToRootView()
+                    } label: {
+                        Text("Selesai & Kembali ke Dashboard")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.clear)
+                            .foregroundStyle(.brown)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.brown, lineWidth: 1)
+                            )
+                    }
                 }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.brown)
-                .cornerRadius(12)
                 .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.bottom, 30)
             }
         }
     }

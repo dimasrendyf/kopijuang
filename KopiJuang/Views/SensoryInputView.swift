@@ -52,6 +52,7 @@ struct SensoryInputView: View {
     @State private var sweetness: Double = 6
     @State private var bitterness: Double = 6
     @State private var bodyScore: Double = 6
+    @State private var tasteCategory: FlavorCategory = .fruity
     
     @State private var scrollToTopNonce: Int = 0
     
@@ -90,7 +91,8 @@ struct SensoryInputView: View {
                                 acidity: $acidity,
                                 sweetness: $sweetness,
                                 bitterness: $bitterness,
-                                bodyScore: $bodyScore
+                                bodyScore: $bodyScore,
+                                category: $tasteCategory
                             )
                         }
                         
@@ -162,7 +164,8 @@ struct SensoryInputView: View {
                             acidity: acidity,
                             sweetness: sweetness,
                             bitterness: bitterness,
-                            bodyScore: bodyScore
+                            bodyScore: bodyScore,
+                            tasteCategory: tasteCategory
                         )
                     )
                 ) {
@@ -514,6 +517,7 @@ private struct TasteStepView: View {
     @Binding var sweetness: Double
     @Binding var bitterness: Double
     @Binding var bodyScore: Double
+    @Binding var category: FlavorCategory
     
     var body: some View {
         VStack(spacing: 18) {
@@ -570,6 +574,13 @@ private struct TasteStepView: View {
                     lowText: "Ringan",
                     highText: "Tebal"
                 )
+                
+                InputCard(
+                    title: "Kesan Keseluruhan",
+                    prompt: "Setelah slurp, kategori rasa apa yang paling menggambarkan kopi ini secara keseluruhan?"
+                ) {
+                    CategoryPickerGrid(stage: .taste, selection: $category)
+                }
             }
             .padding(.horizontal)
         }

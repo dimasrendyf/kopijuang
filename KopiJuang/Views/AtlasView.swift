@@ -6,17 +6,40 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AtlasView: View {
     @State private var searchText = ""
+    @Query private var userProgresses: [UserProgress]
     
-    // Mock Data - Nanti ini bisa diambil dari SwiftData
-    @State var flavors: [FlavorNote] = [
-        FlavorNote(name: "Citrus", category: "Fruity", description: "Asam segar seperti jeruk.", icon: "tree.fill", isUnlocked: true),
-        FlavorNote(name: "Berry", category: "Fruity", description: "Manis asam khas stroberi.", icon: "laurel.trailing", isUnlocked: false),
-        FlavorNote(name: "Jasmine", category: "Floral", description: "Aroma bunga yang halus.", icon: "tree.fill", isUnlocked: false),
-        FlavorNote(name: "Hazelnut", category: "Nutty", description: "Rasa kacang sangrai.", icon: "circle.circle.fill", isUnlocked: true)
-    ]
+    // Convert FlavorWheelData to FlavorNote
+    private var flavors: [FlavorNote] {
+        let progress = userProgresses.first ?? UserProgress()
+        var list: [FlavorNote] = []
+        
+        func traverse(_ node: FlavorWheelNode) {
+            let isUnlocked: Bool
+            if node.layer == 1 {
+                isUnlocked = progress.unlockedPrimaryNotes.contains(node.name)
+            } else if node.layer == 2 {
+                isUnlocked = progress.unlockedSecondaryNotes.contains(node.name)
+            } else {
+                isUnlocked = progress.unlockedSpecificNotes.contains(node.name)
+            }
+            
+            list.append(FlavorNote(
+                name: node.name,
+                category: node.layer == 1 ? node.name : (node.parent ?? ""),
+                description: node.description,
+                icon: node.layer == 1 ? "star.fill" : "circle.fill",
+                isUnlocked: isUnlocked
+            ))
+            node.children.forEach { traverse($0) }
+        }
+        
+        FlavorWheelData.wheel.forEach { traverse($0) }
+        return list
+    }
     
     // Logic Search
     var filteredFlavors: [FlavorNote] {

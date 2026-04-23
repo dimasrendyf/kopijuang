@@ -20,11 +20,11 @@ Core experience aplikasi saat ini:
 8. Aplikasi menampilkan hasil analisis.
 9. Pengguna menjawab kategori rasa dominan. (PILIH SALAH SATU)
 10. Jika salah, pengguna diarahkan ke latihan referensi rasa dari opsi tersebut.
-11. Jika benar, maka pengguna mendapatkan badge atas notes yang udah di unlocked yg nantinya bisa diakses lagi dari Flavor Atlas. Selain itu pengguna diberitahu kalau masih ada secondary taste dari kopi berdasarkan flavor wheel. Apakah kamu mau mencoba untuk menebaknya? kalau mau, maka pengguna diberitahu kalau notes secondary itu ada apa aja dari rasa yang telah dipilih contohnya pada kategory dominan pertama adalah fruity, maka secondary taste nya adalah berry, dried fruit, other fruit, citrus fruit.
-12. Jika benar, maka lanjut lagi ke layer paling luar. contohnya pada secondary tadi, user milih itu adalah berry. maka opsi selanjutnya adalah blueberry, black berry, strawberry, raspberry. ditiap opsinya diberikan deskripsi singkat apa itu
-13. Jika user berhasil menebak semua notes yang ada di flavor wheel, maka pengguna akan mendapatkan badge khusus, juga menampilkan halaman bahwa proses belajar dari notes tersebut selesai dan menampilkan apa saja pencapaiannya. Setelah itu, pengguna bisa melanjutkan ke sesi kopi berikutnya. 
+11. Jika benar, maka pengguna mendapatkan badge atas notes yang udah di unlocked yg nantinya bisa diakses lagi dari Flavor Atlas. Selain itu pengguna diberitahu kalau masih ada secondary taste dari kopi berdasarkan flavor wheel. Apakah kamu mau mencoba untuk menebaknya? kalau mau, maka pengguna diberitahu kalau notes secondary itu ada apa aja dari rasa yang telah dipilih contohnya pada kategory dominan pertama adalah fruity, maka secondary taste nya adalah berry, dried fruit, other fruit, citrus fruit. (belum di implement)
+12. Jika benar, maka lanjut lagi ke layer paling luar. contohnya pada secondary tadi, user milih itu adalah berry. maka opsi selanjutnya adalah blueberry, black berry, strawberry, raspberry. ditiap opsinya diberikan deskripsi singkat apa itu. (belum di implement)
+13. Jika user berhasil menebak semua notes yang ada di flavor wheel, maka pengguna akan mendapatkan badge khusus, juga menampilkan halaman bahwa proses belajar dari notes tersebut selesai dan menampilkan apa saja pencapaiannya. Setelah itu, pengguna bisa melanjutkan ke sesi kopi berikutnya.  (belum di implement)
 14. Pengguna juga bisa membuka Flavor Atlas untuk mempelajari notes yang unlocked/locked.
-yang isinya adalah deskripsi singkat apa notes tersebut, gambarannya seperti apa, dan contoh kopi yang memiliki notes tersebut.
+yang isinya adalah deskripsi singkat apa notes tersebut, gambarannya seperti apa, dan contoh kopi yang memiliki notes tersebut. (belum di implement)
 
 ## Entry Point dan App State
 
@@ -912,14 +912,16 @@ Flow mulai sesi dari Dashboard:
 
 ```text
 DashboardView
-└── CoffeeSetupView
+└── CoffeeSetupView (🟡 Rencana: Tambah edu roast/process)
     └── SensoryInputView
         ├── Step 1: Fragrance
         ├── Step 2: Aroma
-        ├── Step 3: Taste
+        ├── Step 3: Taste (🟡 Rencana: Tambah taste category input)
         └── ResultView
-            └── FeedbackView
-                └── TrainingView (jika jawaban salah)
+            ├── Quiz Layer 1 (Kategori Dominan)
+            │   ├── Benar -> 🔴 Rencana: Secondary Quiz View -> Specific Notes Quiz -> Achievement View
+            │   └── Salah -> FeedbackView -> TrainingView
+            └── 🟡 Rencana: Post-training flow (Pilihan Retry Quiz / ke Dashboard)
 ```
 
 Flow bantuan dari Dashboard:
@@ -937,32 +939,49 @@ MainTabView
     └── FlavorDetailView
 ```
 
-## Catatan Teknis dan Potensi Pengembangan
+## Catatan Teknis, Gap, dan Potensi Pengembangan
 
-Hal yang sudah kuat:
+### Hal yang sudah kuat:
 
 - Flow sensory sudah jelas dan bertahap.
 - Model `SensoryEvaluation` sudah mencakup metadata, dry fragrance, wet aroma, dan taste metrics.
 - UI memberi edukasi contextual pada tiap step.
 - Ada pemisahan kasar antara Dashboard, Setup, Input, Result, Training, dan Atlas.
+- Prinsip UX "kesalahan bukan kegagalan, tapi arah belajar" sangat kuat dan membuat app terasa supportive.
 
-Hal yang masih mock atau belum tersambung:
+### Gap Kritis (Core Experience vs Implementasi):
 
+Terdapat gap besar antara "Core Experience" (poin 11-13) dengan view yang sudah ada:
+- **Cascading Quiz Belum Ada**: Core experience menjanjikan kuis 3 layer (Dominan -> Secondary -> Specific), namun `ResultView` saat ini hanya memiliki 1 layer (Dominan).
+- **Gamification Belum Lengkap**: Halaman pencapaian (Achievement View) setelah menebak semua layer dan model Badge yang menyimpan progress per-layer belum ada.
+- **Logika Kuis**: Jawaban "benar" saat ini ditentukan dari `aromaCategory` (input user sebelumnya), bukan dari hasil metrik rasa (Taste). Ini bisa membuat kuis kurang bermakna.
+
+### Hal yang masih mock atau belum tersambung:
+
+- Edukasi efek roast/process di `CoffeeSetupView` belum diimplementasikan (sesuai poin 6 core experience).
 - `CoffeeSession` belum dibuat dari hasil evaluasi user.
 - `DashboardView.sessions` masih hardcoded.
-- `AtlasView.flavors` masih hardcoded.
+- `AtlasView.flavors` masih hardcoded. Konten `FlavorDetailView` juga masih generik.
 - Unlock flavor/badge belum berubah berdasarkan hasil quiz.
 - `TrainingView.imageForFlavor(_:)` belum dipakai.
+- Post-training flow belum jelas (setelah "Oke, aku sudah coba!", user harus dikembalikan ke kuis atau dashboard?).
 - `CoffeeBean`, `Taste`, dan `SensoryFlow` belum menjadi sumber data utama untuk UI.
 
-Potensi next step arsitektur:
+### Improvement & Next Step Arsitektur (Berdasarkan Prioritas):
 
-- Buat persistence untuk `SensoryEvaluation` dan `CoffeeSession`.
-- Hubungkan hasil `ResultView` ke riwayat Dashboard.
-- Hubungkan jawaban benar/badge ke `FlavorNote.isUnlocked`.
-- Ubah `FlavorNote.category` dari `String` ke `FlavorCategory`.
-- Gunakan `SensoryFlow` sebagai data source carousel Dashboard agar tidak hardcoded.
-- Pertimbangkan membuat store/view model sederhana untuk session dan atlas unlock state.
+**🔴 Prioritas Tinggi (Critical):**
+1. **State Management & Persistence**: Implementasi `SwiftData` atau `@AppStorage` JSON untuk menyimpan `UserProgress` (unlock status, badges), `CompletedSessions`, dan riwayat `SensoryEvaluation`. Tanpa ini, app tidak usable karena progress hilang saat ditutup.
+2. **Perbaiki Logika Kuis (`correctCategory`)**: Tentukan jawaban benar dari heuristic Taste Metrics (misal: Acidity tinggi + Sweetness sedang = Fruity) ATAU ubah pertanyaan kuis menjadi "Kategori apa yang paling menggambarkan kopi ini?".
+3. **Bangun Infrastruktur Gamification**: Buat model `UserProgress` dan `Badge`.
+4. **Cascading Quiz & Flavor Wheel Model**: Buat struktur data `FlavorWheelNode` (mendukung layer 1, 2, 3) dan lengkapi UI untuk Secondary Taste Quiz dan Specific Notes Quiz.
+
+**🟡 Prioritas Sedang (Enhancement):**
+5. **Edukasi di Coffee Setup**: Tambahkan teks singkat di bawah picker Roast/Process tentang efek masing-masing level.
+6. **Perjelas Post-Training Flow**: Tambahkan opsi "Coba tebak lagi" (kembali ke Result) atau "Kembali ke Dashboard" setelah training selesai.
+7. **Input "Taste Category"**: Tambahkan input kategori kesan pertama setelah slurp di Step 3 (Taste) untuk menjembatani metrik skor dan kuis Result.
+
+**🟢 Prioritas Rendah (Ekspansi):**
+8. **Perluas Kategori Rasa (FlavorCategory)**: Saat ini hanya 4 (Fruity, Floral, Nutty, Sweet). Pertimbangkan untuk menambah Spices dan Roasted yang umum pada kopi Indonesia.
 
 ## Prinsip UX yang Sedang Dipakai
 
