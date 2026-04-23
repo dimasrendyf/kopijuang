@@ -10,10 +10,10 @@ import SwiftData
 
 struct DashboardView: View {
     @State private var showGuide = false
-    @Query private var userProgresses: [UserProgress]
+    @Query(sort: \SessionHistory.date, order: .reverse) private var allSessions: [SessionHistory]
     
     var completedSessions: [SessionHistory] {
-        return userProgresses.first?.completedSessions.sorted(by: { $0.date > $1.date }) ?? []
+        allSessions
     }
     
     var body: some View {

@@ -17,21 +17,14 @@ struct ResultView: View {
     
     // State untuk feedback
     @State private var showingFeedback = false
-    @State private var isCorrect = false
+    @State private var isCorrect = true
     @State private var feedbackMessage = ""
     @State private var selectedCategory: FlavorCategory?
+    @State private var showDiscovery = false
     
     // For navigation
     @State private var navigateToCascading = false
     
-    private var correctCategory: FlavorCategory {
-        if evaluation.acidity > 6 && evaluation.sweetness >= 4 { return .fruity }
-        if evaluation.sweetness > 6 && evaluation.bitterness < 5 { return .sweet }
-        if evaluation.bodyScore > 6 && evaluation.bitterness >= 5 { return .nutty }
-        if evaluation.acidity <= 5 && evaluation.bodyScore <= 5 { return .floral }
-        return evaluation.tasteCategory
-    }
-
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -84,8 +77,12 @@ struct ResultView: View {
 
                 // 2. Question Section
                 VStack(spacing: 16) {
-                    Text("Menurut kamu, kategori apa yang paling menggambarkan profil kopi ini secara keseluruhan berdasarkan analismu?")
+                    Text("Menurut kamu, kategori apa yang paling menggambarkan profil kopi ini secara keseluruhan?")
                         .font(.title3.bold())
+                        .multilineTextAlignment(.center)
+                    Text("Tidak ada jawaban benar atau salah. Pilih yang paling mendekati pengalaman lidahmu, lalu kita lanjut eksplorasi layer berikutnya.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                     
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
@@ -102,6 +99,20 @@ struct ResultView: View {
                             )
                         }
                     }
+
+                    Button {
+                        showDiscovery = true
+                    } label: {
+                        Text("Aku gak yakin, bantu discovery notes")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(.systemGray4), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                            )
+                    }
                 }
                 .padding(.horizontal)
             }
@@ -110,45 +121,48 @@ struct ResultView: View {
         .navigationTitle("Hasil Analisis")
         .sheet(isPresented: $showingFeedback) {
             FeedbackView(
-                isCorrect: isCorrect, 
-                message: feedbackMessage, 
-                category: correctCategory,
-                nextAction: isCorrect ? {
+                isCorrect: isCorrect,
+                message: feedbackMessage,
+                category: selectedCategory ?? .fruity,
+                nextAction: {
                     showingFeedback = false
                     // Give sheet time to dismiss before navigating
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         navigateToCascading = true
                     }
-                } : nil
+                }
             )
         }
         .navigationDestination(isPresented: $navigateToCascading) {
             if let cat = selectedCategory {
-                CascadingQuizView(evaluation: evaluation, parentNodeId: cat.rawValue)
+                CascadingQuizView(
+                    evaluation: evaluation,
+                    selectedPrimaryCategory: cat,
+                    parentNodeId: cat.rawValue
+                )
+            }
+        }
+        .sheet(isPresented: $showDiscovery) {
+            NavigationStack {
+                DiscoveryNotesView(stage: .taste)
             }
         }
     }
 
     func checkAnswer(_ category: FlavorCategory) {
         selectedCategory = category
-        if category == correctCategory {
-            isCorrect = true
-            feedbackMessage = "Tepat sekali! Kamu punya indera perasa yang tajam. Badge \(category.rawValue) berhasil didapatkan!"
-            
-            // Unlock primary note
-            let progress = userProgresses.first ?? UserProgress()
-            if userProgresses.isEmpty {
-                modelContext.insert(progress)
-            }
-            if !progress.unlockedPrimaryNotes.contains(category.rawValue) {
-                progress.unlockedPrimaryNotes.append(category.rawValue)
-            }
-            progress.totalCorrectGuesses += 1
-            try? modelContext.save()
-            
-        } else {
-            isCorrect = false
-            feedbackMessage = "Hmm, menarik! Tapi sebenarnya profil ini lebih condong ke \(correctCategory.rawValue). Mau coba latihan referensi rasa \(correctCategory.rawValue)?"
+        isCorrect = true
+        feedbackMessage = "\(category.rawValue) itu luas. Yuk lanjut, rasa turunan apa yang paling mendekati kopimu?"
+
+        let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
+        if !progress.unlockedPrimaryNotes.contains(category.rawValue) {
+            progress.unlockedPrimaryNotes.append(category.rawValue)
+        }
+        progress.experiencedNotes.append(category.rawValue)
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed saving ResultView progress: \(error.localizedDescription)")
         }
         showingFeedback = true
     }
@@ -283,7 +297,7 @@ struct FeedbackView: View {
                         Button {
                             nextAction()
                         } label: {
-                            Text("Lanjut Tebak Rasa Spesifik")
+                            Text("Lanjut Eksplorasi Rasa")
                                 .bold()
                                 .frame(maxWidth: .infinity)
                         }

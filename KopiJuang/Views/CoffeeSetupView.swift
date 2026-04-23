@@ -17,57 +17,55 @@ struct CoffeeSetupView: View {
     let processOptions: [String] = ["Natural", "Wash", "Honey", "Anaerobic", "Wet Hulled"]
     
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Siapkan Cangkirmu")
-                            .font(.title.bold())
-                        
-                        Text("Ceritakan sedikit tentang kopi ini. Kami akan memandu indramu untuk menemukan rasa tersembunyi di dalamnya.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.vertical, 10)
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Siapkan Cangkirmu")
+                        .font(.title.bold())
+                    
+                    Text("Ceritakan sedikit tentang kopi ini. Kami akan memandu indramu untuk menemukan rasa tersembunyi di dalamnya.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .listRowBackground(Color.clear)
+                .padding(.vertical, 10)
+            }
+            .listRowBackground(Color.clear)
+            
+            Section("Detail Beans") {
+                LabeledTextField(icon: "leaf.fill", placeholder: "Nama Kopi (contoh: Gayo)", text: $beanName)
+                LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $beanOrigin)
                 
-                Section("Detail Beans") {
-                    LabeledTextField(icon: "leaf.fill", placeholder: "Nama Kopi (contoh: Gayo)", text: $beanName)
-                    LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $beanOrigin)
-                    
-                    // FIX PICKER: Tambahkan tag kosong
-                    Picker("Roast Level", selection: $roastLevel) {
-                        Text("Pilih Level...").tag("")
-                        ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
-                    }
-                    
-                    if !roastLevel.isEmpty {
-                        Text(roastDescription(for: roastLevel))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Picker("Process", selection: $processLevel) {
-                        Text("Pilih Proses...").tag("")
-                        ForEach(processOptions, id: \.self) { Text($0).tag($0) }
-                    }
-                    
-                    if !processLevel.isEmpty {
-                        Text(processDescription(for: processLevel))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                // FIX PICKER: Tambahkan tag kosong
+                Picker("Roast Level", selection: $roastLevel) {
+                    Text("Pilih Level...").tag("")
+                    ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
+                }
+                
+                if !roastLevel.isEmpty {
+                    Text(roastDescription(for: roastLevel))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Picker("Process", selection: $processLevel) {
+                    Text("Pilih Proses...").tag("")
+                    ForEach(processOptions, id: \.self) { Text($0).tag($0) }
+                }
+                
+                if !processLevel.isEmpty {
+                    Text(processDescription(for: processLevel))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SensoryInputView(beanName: beanName, beanOrigin: beanOrigin, roastLevel: roastLevel, processLevel: processLevel)) {
-                        Label("Mulai", systemImage: "checkmark").bold()
-                    }
-                    .disabled(beanName.isEmpty || roastLevel.isEmpty || processLevel.isEmpty)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: SensoryInputView(beanName: beanName, beanOrigin: beanOrigin, roastLevel: roastLevel, processLevel: processLevel)) {
+                    Label("Mulai", systemImage: "checkmark").bold()
                 }
+                .disabled(beanName.isEmpty || roastLevel.isEmpty || processLevel.isEmpty)
             }
         }
     }

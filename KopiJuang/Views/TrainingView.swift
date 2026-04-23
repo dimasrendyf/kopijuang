@@ -10,6 +10,7 @@ import SwiftUI
 struct TrainingView: View {
     @Environment(\.dismiss) var dismiss
     let flavor: String
+    var stage: DiscoveryStage = .taste
 
     var body: some View {
         ScrollView { // Gunakan ScrollView biar aman di layar kecil
@@ -30,7 +31,7 @@ struct TrainingView: View {
                             .font(.title2.bold())
                             .multilineTextAlignment(.center)
                         
-                        Text("Gapapa salah tebak, ini proses belajar.")
+                        Text(stageSubtitle)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -43,7 +44,7 @@ struct TrainingView: View {
                         .font(.headline)
                         .foregroundStyle(.brown)
                     
-                    Text("Jika punya \(flavor), potong kecil dan cium aromanya. Jika tidak, coba ingat rasa air perasan lemon.")
+                    Text(trainingPrompt)
                         .font(.subheadline)
                         .lineSpacing(4)
                 }
@@ -57,9 +58,9 @@ struct TrainingView: View {
                     Text("Langkah Latihan:")
                         .font(.headline)
                     
-                    TrainingStepRow(number: 1, text: "Cium referensi \(flavor).")
-                    TrainingStepRow(number: 2, text: "Tahan rasa itu di memori lidahmu.")
-                    TrainingStepRow(number: 3, text: "Icip kopimu lagi dengan teknik slurp.")
+                    TrainingStepRow(number: 1, text: stageSteps[0])
+                    TrainingStepRow(number: 2, text: stageSteps[1])
+                    TrainingStepRow(number: 3, text: stageSteps[2])
                 }
                 .padding(.horizontal)
 
@@ -100,6 +101,51 @@ struct TrainingView: View {
         }
     }
     
+    private var stageSubtitle: String {
+        switch stage {
+        case .fragrance:
+            return "Gapapa kalau masih bingung. Yuk latih hidungmu dulu di tahap fragrance."
+        case .aroma:
+            return "Wajar kalau dry dan wet kadang mirip. Yuk latih pembacaan aroma bloom."
+        case .taste:
+            return "Gapapa salah tebak, ini proses belajar rasa di lidah."
+        }
+    }
+
+    private var trainingPrompt: String {
+        switch stage {
+        case .fragrance:
+            return "Siapkan referensi \(flavor) lalu cium dalam kondisi kering. Fokus di hidung, jangan buru-buru menilai rasa."
+        case .aroma:
+            return "Siapkan referensi \(flavor), lalu bandingkan aromanya setelah kontak air panas. Tujuannya melatih transisi dry ke wet."
+        case .taste:
+            return "Siapkan referensi \(flavor). Jika tidak ada, gunakan ingatan rasa yang mirip untuk bantu kalibrasi saat menyeruput."
+        }
+    }
+
+    private var stageSteps: [String] {
+        switch stage {
+        case .fragrance:
+            return [
+                "Cium referensi \(flavor) dalam kondisi kering.",
+                "Sebutkan 1-2 kata kunci aromanya (misal segar, manis, kacang).",
+                "Cium bubuk kopimu lagi dan bandingkan."
+            ]
+        case .aroma:
+            return [
+                "Cium referensi \(flavor), lalu cium kopi saat wet/bloom.",
+                "Catat apakah aroma jadi lebih jelas atau berubah.",
+                "Bandingkan lagi dengan fase dry untuk lihat kontras."
+            ]
+        case .taste:
+            return [
+                "Cium atau icip referensi \(flavor) untuk kalibrasi cepat.",
+                "Tahan sensasi itu di memori lidahmu.",
+                "Icip kopimu lagi dengan teknik slurp."
+            ]
+        }
+    }
+    
     // Helper function untuk gambar dinamis
     func imageForFlavor(_ flv: String) -> String {
         switch flv.lowercased() {
@@ -135,5 +181,5 @@ struct TrainingStepRow: View {
 }
 
 #Preview {
-    TrainingView(flavor: "Citrus")
+    TrainingView(flavor: "Citrus", stage: .taste)
 }

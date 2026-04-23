@@ -14,31 +14,53 @@ struct AtlasView: View {
     
     // Convert FlavorWheelData to FlavorNote
     private var flavors: [FlavorNote] {
-        let progress = userProgresses.first ?? UserProgress()
+        let unlockedPrimary = Set(userProgresses.flatMap(\.unlockedPrimaryNotes))
+        let unlockedSecondary = Set(userProgresses.flatMap(\.unlockedSecondaryNotes))
+        let unlockedSpecific = Set(userProgresses.flatMap(\.unlockedSpecificNotes))
+        let experienced = userProgresses.flatMap(\.experiencedNotes)
         var list: [FlavorNote] = []
         
         func traverse(_ node: FlavorWheelNode) {
             let isUnlocked: Bool
             if node.layer == 1 {
-                isUnlocked = progress.unlockedPrimaryNotes.contains(node.name)
+                isUnlocked = unlockedPrimary.contains(node.name)
             } else if node.layer == 2 {
-                isUnlocked = progress.unlockedSecondaryNotes.contains(node.name)
+                isUnlocked = unlockedSecondary.contains(node.name)
             } else {
-                isUnlocked = progress.unlockedSpecificNotes.contains(node.name)
+                isUnlocked = unlockedSpecific.contains(node.name)
             }
+
+            let experienceCount = experienced.filter { $0 == node.name }.count
             
             list.append(FlavorNote(
                 name: node.name,
                 category: node.layer == 1 ? node.name : (node.parent ?? ""),
                 description: node.description,
                 icon: node.layer == 1 ? "star.fill" : "circle.fill",
-                isUnlocked: isUnlocked
+                isUnlocked: isUnlocked,
+                experienceCount: experienceCount,
+                familiarityLevel: familiarityLabel(for: experienceCount)
             ))
             node.children.forEach { traverse($0) }
         }
         
         FlavorWheelData.wheel.forEach { traverse($0) }
         return list
+    }
+
+    private func familiarityLabel(for count: Int) -> String {
+        switch count {
+        case 0:
+            return "Belum dijelajahi"
+        case 1...2:
+            return "Pemula"
+        case 3...5:
+            return "Kenal"
+        case 6...9:
+            return "Akrab"
+        default:
+            return "Peka"
+        }
     }
     
     // Logic Search
@@ -83,6 +105,12 @@ struct FlavorCard: View {
             Text(flavor.isUnlocked ? flavor.name : "???")
                 .font(.headline)
                 .foregroundColor(flavor.isUnlocked ? .brown : .gray)
+
+            if flavor.isUnlocked {
+                Text("\(flavor.familiarityLevel) • \(flavor.experienceCount)x")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(height: 140)
         .frame(maxWidth: .infinity)

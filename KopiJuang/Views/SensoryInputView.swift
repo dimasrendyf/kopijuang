@@ -57,67 +57,67 @@ struct SensoryInputView: View {
     @State private var scrollToTopNonce: Int = 0
     
     var body: some View {
-        NavigationStack {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(spacing: 32) {
-                        Color.clear
-                            .frame(height: 1)
-                            .id("top")
-                        
-                        header
-                        
-                        switch step {
-                        case .fragrance:
-                            FragranceStepView(
-                                intensity: $fragranceIntensity,
-                                category: $fragranceCategory
-                            )
-                            .onAppear {
-                                if aromaCategory == .nutty { aromaCategory = fragranceCategory }
-                            }
-                        case .aroma:
-                            AromaStepView(
-                                dryCategory: fragranceCategory,
-                                contrast: $aromaContrast,
-                                wetCategory: $aromaCategory,
-                                wetIntensity: $aromaIntensity
-                            )
-                            .onAppear {
-                                if aromaContrast == .same { aromaCategory = fragranceCategory }
-                            }
-                        case .taste:
-                            TasteStepView(
-                                acidity: $acidity,
-                                sweetness: $sweetness,
-                                bitterness: $bitterness,
-                                bodyScore: $bodyScore,
-                                category: $tasteCategory
-                            )
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 32) {
+                    Color.clear
+                        .frame(height: 1)
+                        .id("top")
+                    
+                    header
+                    
+                    switch step {
+                    case .fragrance:
+                        FragranceStepView(
+                            intensity: $fragranceIntensity,
+                            category: $fragranceCategory
+                        )
+                        .onAppear {
+                            if aromaCategory == .nutty { aromaCategory = fragranceCategory }
                         }
-                        
-                        footer
+                    case .aroma:
+                        AromaStepView(
+                            dryCategory: fragranceCategory,
+                            contrast: $aromaContrast,
+                            wetCategory: $aromaCategory,
+                            wetIntensity: $aromaIntensity
+                        )
+                        .onAppear {
+                            if aromaContrast == .same { aromaCategory = fragranceCategory }
+                        }
+                    case .taste:
+                        TasteStepView(
+                            roastLevel: roastLevel,
+                            processLevel: processLevel,
+                            acidity: $acidity,
+                            sweetness: $sweetness,
+                            bitterness: $bitterness,
+                            bodyScore: $bodyScore,
+                            category: $tasteCategory
+                        )
                     }
-                }
-                .onChange(of: scrollToTopNonce) { _ in
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
+                    
+                    footer
                 }
             }
-            .navigationTitle("Sensory")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        goBackOrDismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.headline)
-                    }
-                    .tint(.brown)
+            .onChange(of: scrollToTopNonce) { _ in
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    proxy.scrollTo("top", anchor: .top)
                 }
+            }
+        }
+        .navigationTitle("Sensory")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    goBackOrDismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.headline)
+                }
+                .tint(.brown)
             }
         }
     }
@@ -282,6 +282,7 @@ private struct FragranceStepView: View {
     @State private var isSniffing = true
     @State private var ringScale: CGFloat = 0.2
     @State private var ringOpacity: Double = 0.8
+    @State private var showDiscovery = false
     
     var body: some View {
         VStack(spacing: 18) {
@@ -337,10 +338,17 @@ private struct FragranceStepView: View {
                     title: "Aksi 2",
                     prompt: "Dari opsi di bawah, pilih kategori notes yang paling dominan kamu rasakan saat mencium kopi kering."
                 ) {
-                    CategoryPickerGrid(stage: .fragrance, selection: $category)
+                    CategoryPickerGrid(stage: .fragrance, selection: $category) {
+                        showDiscovery = true
+                    }
                 }
             }
             .padding(.horizontal)
+        }
+        .sheet(isPresented: $showDiscovery) {
+            NavigationStack {
+                DiscoveryNotesView(stage: .fragrance)
+            }
         }
     }
     
@@ -375,6 +383,7 @@ private struct AromaStepView: View {
     @Binding var contrast: AromaContrast
     @Binding var wetCategory: FlavorCategory
     @Binding var wetIntensity: Double
+    @State private var showDiscovery = false
     
     var body: some View {
         VStack(spacing: 18) {
@@ -384,12 +393,12 @@ private struct AromaStepView: View {
             )
             .padding(.horizontal)
             
-            ContrastTrackerCard(
-                dryCategory: dryCategory,
-                contrast: contrast,
-                wetCategory: contrast == .same ? dryCategory : wetCategory
-            )
-            .padding(.horizontal)
+//            ContrastTrackerCard(
+//                dryCategory: dryCategory,
+//                contrast: contrast,
+//                wetCategory: contrast == .same ? dryCategory : wetCategory
+//            )
+//            .padding(.horizontal)
             
             VStack(spacing: 14) {
                 InputCard(
@@ -422,7 +431,9 @@ private struct AromaStepView: View {
                         title: "Aksi 3",
                         prompt: "Dari opsi di bawah, pilih kategori notes yang paling dominan kamu rasakan saat kopi sudah wet/bloom."
                     ) {
-                        CategoryPickerGrid(stage: .aroma, selection: $wetCategory)
+                        CategoryPickerGrid(stage: .aroma, selection: $wetCategory) {
+                            showDiscovery = true
+                        }
                     }
                 } else {
                     InputCard(
@@ -445,6 +456,11 @@ private struct AromaStepView: View {
         }
         .onChange(of: contrast) { newValue in
             if newValue == .same { wetCategory = dryCategory }
+        }
+        .sheet(isPresented: $showDiscovery) {
+            NavigationStack {
+                DiscoveryNotesView(stage: .aroma)
+            }
         }
     }
 }
@@ -513,24 +529,31 @@ private struct ContrastPill: View {
 
 // MARK: - Step 3: Taste (Sip + Retronasal)
 private struct TasteStepView: View {
+    let roastLevel: String
+    let processLevel: String
     @Binding var acidity: Double
     @Binding var sweetness: Double
     @Binding var bitterness: Double
     @Binding var bodyScore: Double
     @Binding var category: FlavorCategory
+    @State private var showDiscovery = false
     
     var body: some View {
-        VStack(spacing: 18) {
-            StepIntroCard(
-                title: "Info tahap ini",
-                message: "Kamu sedang menilai rasa saat diminum. Seruput perlahan, rasakan, lalu nilai intensitas tiap atribut."
-            )
+        VStack(spacing: 20) {
+            VStack(spacing: 12) {
+                StepIntroCard(
+                    title: "Info tahap ini",
+                    message: "Kamu sedang menilai rasa saat diminum. Seruput perlahan, rasakan, lalu nilai intensitas tiap atribut."
+                )
+                SlurpMentorCard()
+                TasteBridgeCard(
+                    roastLevel: roastLevel,
+                    processLevel: processLevel
+                )
+            }
             .padding(.horizontal)
-            
-            SlurpMentorCard()
-                .padding(.horizontal)
-            
-            VStack(spacing: 14) {
+
+            VStack(spacing: 12) {
                 TasteMetricCard(
                     title: "Acidity",
                     subtitle: "Sensasi segar/bright, bukan asam yang menusuk.",
@@ -579,11 +602,79 @@ private struct TasteStepView: View {
                     title: "Kesan Keseluruhan",
                     prompt: "Setelah slurp, kategori rasa apa yang paling menggambarkan kopi ini secara keseluruhan?"
                 ) {
-                    CategoryPickerGrid(stage: .taste, selection: $category)
+                    CategoryPickerGrid(stage: .taste, selection: $category) {
+                        showDiscovery = true
+                    }
                 }
             }
             .padding(.horizontal)
         }
+        .sheet(isPresented: $showDiscovery) {
+            NavigationStack {
+                DiscoveryNotesView(stage: .taste)
+            }
+        }
+    }
+}
+
+private struct TasteBridgeCard: View {
+    let roastLevel: String
+    let processLevel: String
+
+    private var roastHint: String {
+        switch roastLevel.lowercased() {
+        case "light":
+            return "Light roast biasanya punya acidity lebih cerah. Coba fokus ke sensasi fresh di sisi lidah."
+        case "dark":
+            return "Dark roast biasanya punya body dan pahit lebih dominan. Coba cek apakah aftertaste terasa tebal."
+        case "medium":
+            return "Medium roast biasanya lebih balance. Coba amati keseimbangan asam, manis, dan pahit."
+        default:
+            return "Profil roast ini bisa bergerak dinamis. Coba cari atribut yang paling menonjol dulu."
+        }
+    }
+
+    private var processHint: String {
+        switch processLevel.lowercased() {
+        case "natural":
+            return "Natural process biasanya membawa sweetness lebih menonjol dan karakter fruity."
+        case "wash", "washed":
+            return "Washed process biasanya terasa lebih bersih dan terang. Coba cek kejernihan rasa."
+        case "honey":
+            return "Honey process sering memberi manis yang round dan body yang nyaman."
+        case "anaerobic":
+            return "Anaerobic process sering menonjolkan karakter unik dan fermenty; nilai dengan tenang agar tetap objektif."
+        case "wet hulled":
+            return "Wet hulled sering memberi body tebal dan nuansa earthy. Coba perhatikan struktur rasanya."
+        default:
+            return "Process ini tetap bisa jadi patokan awal. Bandingkan dengan sensasi yang kamu rasakan langsung."
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Eksplorasi Rasa (Taste)")
+                .font(.headline)
+                .foregroundStyle(.brown)
+
+            Text("Berdasarkan roast \(roastLevel) dan process \(processLevel), karakter apa yang paling kamu rasakan sekarang?")
+                .font(.subheadline.weight(.medium))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Label(roastHint, systemImage: "flame.fill")
+                Label(processHint, systemImage: "drop.fill")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.brown.opacity(0.08))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.brown.opacity(0.2), lineWidth: 1)
+        )
+        .cornerRadius(16)
     }
 }
 
@@ -845,20 +936,16 @@ private extension View {
 }
 
 private struct CategoryPickerGrid: View {
-    enum SensoryStage {
-        case fragrance
-        case aroma
-        case taste
-    }
-    
-    let stage: SensoryStage
+    let stage: DiscoveryStage
     @Binding var selection: FlavorCategory
+    var onUnsureTap: (() -> Void)? = nil
     
     var body: some View {
         VStack(spacing: 10) {
             ForEach(FlavorCategory.allCases) { category in
                 categoryRow(category)
             }
+            unsureButton
         }
     }
     
@@ -908,6 +995,36 @@ private struct CategoryPickerGrid: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(isSelected ? Color.brown.opacity(0.45) : Color(.systemGray4), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var unsureButton: some View {
+        Button {
+            onUnsureTap?()
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "questionmark.circle")
+                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Aku gak yakin")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text("Buka discovery notes untuk bantu kalibrasi \(stage.title.lowercased()).")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(Color(.systemGray6))
+            .cornerRadius(14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color(.systemGray4), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
             )
         }
         .buttonStyle(.plain)

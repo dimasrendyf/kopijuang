@@ -11,15 +11,25 @@ class UserProgress {
     var unlockedPrimaryNotes: [String]
     var unlockedSecondaryNotes: [String]
     var unlockedSpecificNotes: [String]
+    var experiencedNotes: [String]
     var totalCorrectGuesses: Int
     
     @Relationship(deleteRule: .cascade) var completedSessions: [SessionHistory]
     @Relationship(deleteRule: .cascade) var badges: [UserBadge]
     
-    init(unlockedPrimaryNotes: [String] = [], unlockedSecondaryNotes: [String] = [], unlockedSpecificNotes: [String] = [], totalCorrectGuesses: Int = 0, completedSessions: [SessionHistory] = [], badges: [UserBadge] = []) {
+    init(
+        unlockedPrimaryNotes: [String] = [],
+        unlockedSecondaryNotes: [String] = [],
+        unlockedSpecificNotes: [String] = [],
+        experiencedNotes: [String] = [],
+        totalCorrectGuesses: Int = 0,
+        completedSessions: [SessionHistory] = [],
+        badges: [UserBadge] = []
+    ) {
         self.unlockedPrimaryNotes = unlockedPrimaryNotes
         self.unlockedSecondaryNotes = unlockedSecondaryNotes
         self.unlockedSpecificNotes = unlockedSpecificNotes
+        self.experiencedNotes = experiencedNotes
         self.totalCorrectGuesses = totalCorrectGuesses
         self.completedSessions = completedSessions
         self.badges = badges

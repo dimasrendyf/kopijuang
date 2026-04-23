@@ -14,4 +14,6 @@ struct FlavorNote: Identifiable {
     let description: String
     let icon: String // SF Symbol name
     var isUnlocked: Bool
+    var experienceCount: Int
+    var familiarityLevel: String
 }

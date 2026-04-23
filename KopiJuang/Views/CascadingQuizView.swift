@@ -12,6 +12,7 @@ struct CascadingQuizView: View {
     @Query private var userProgresses: [UserProgress]
     
     let evaluation: SensoryEvaluation
+    let selectedPrimaryCategory: FlavorCategory
     let parentNodeId: String
     
     @State private var parentNode: FlavorWheelNode?
@@ -19,18 +20,17 @@ struct CascadingQuizView: View {
     @State private var isCorrect = false
     @State private var selectedNode: FlavorWheelNode?
     
-    // For navigation to specific/achievement
+    // For navigation to specific/final analysis
     @State private var navigateToNext = false
-    @State private var navigateToAchievement = false
-    @State private var isFinished = false
+    @State private var navigateToFinalAnalysis = false
     
     var body: some View {
         VStack(spacing: 20) {
             if let parent = parentNode {
-                Text("Tebak Rasa \(parent.layer == 1 ? "Secondary" : "Spesifik")")
+                Text("Eksplorasi Rasa \(parent.layer == 1 ? "Secondary" : "Spesifik")")
                     .font(.title2.bold())
                 
-                Text("Kamu sudah menebak bahwa kopi ini dominan rasa \(parent.name). Sekarang, rasa spesifik apa yang paling kamu rasakan?")
+                Text("Kamu memilih \(parent.name). Dari opsi di bawah, mana yang paling mendekati pengalaman rasamu?")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
@@ -78,7 +78,7 @@ struct CascadingQuizView: View {
         .sheet(isPresented: $showingFeedback) {
             FeedbackView(
                 isCorrect: isCorrect,
-                message: isCorrect ? "Luar biasa! Pengecapanmu sangat presisi!" : "Sayang sekali, masih kurang tepat. Coba terus bereksplorasi!",
+                message: isCorrect ? "Tercatat. Semakin sering kamu melatih note ini, semakin tinggi familiarity-mu." : "Coba lagi dan pilih yang paling mendekati sensasi yang kamu rasakan.",
                 category: FlavorCategory(rawValue: parentNode?.name ?? "Fruity") ?? .fruity, // Fallback
                 nextAction: {
                     showingFeedback = false
@@ -87,9 +87,9 @@ struct CascadingQuizView: View {
                             // Go to specific
                             navigateToNext = true
                         } else {
-                            // Finish and show achievement
+                            // Finish and show final analysis
                             saveSession(completed: true)
-                            navigateToAchievement = true
+                            navigateToFinalAnalysis = true
                         }
                     }
                 }
@@ -97,48 +97,65 @@ struct CascadingQuizView: View {
         }
         .navigationDestination(isPresented: $navigateToNext) {
             if let selected = selectedNode {
-                CascadingQuizView(evaluation: evaluation, parentNodeId: selected.id)
+                CascadingQuizView(
+                    evaluation: evaluation,
+                    selectedPrimaryCategory: selectedPrimaryCategory,
+                    parentNodeId: selected.id
+                )
             }
         }
-        .navigationDestination(isPresented: $navigateToAchievement) {
-            AchievementView(evaluation: evaluation)
+        .navigationDestination(isPresented: $navigateToFinalAnalysis) {
+            FinalAnalysisView(
+                evaluation: evaluation,
+                primaryCategory: selectedPrimaryCategory,
+                selectedNode: selectedNode
+            )
         }
     }
     
     private func handleGuess(_ child: FlavorWheelNode) {
         selectedNode = child
-        // Karena ini belajar mandiri, di sini tebakan kita anggap "benar" saja untuk memberi reward (atau bisa dikasih logika khusus)
-        // MVP: anggap benar karena tidak ada cara tahu pasti tanpa validator.
+        // Tahap ini eksploratif, tidak memakai benar/salah.
         isCorrect = true
         
-        let progress = userProgresses.first ?? UserProgress()
-        if userProgresses.isEmpty {
-            modelContext.insert(progress)
-        }
+        let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
         
         if child.layer == 2 {
-            progress.unlockedSecondaryNotes.append(child.name)
+            if !progress.unlockedSecondaryNotes.contains(child.name) {
+                progress.unlockedSecondaryNotes.append(child.name)
+            }
         } else if child.layer == 3 {
-            progress.unlockedSpecificNotes.append(child.name)
+            if !progress.unlockedSpecificNotes.contains(child.name) {
+                progress.unlockedSpecificNotes.append(child.name)
+            }
         }
+        progress.experiencedNotes.append(child.name)
         progress.totalCorrectGuesses += 1
         
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed saving Cascading guess: \(error.localizedDescription)")
+        }
         showingFeedback = true
     }
     
     private func saveSession(completed: Bool) {
-        let progress = userProgresses.first ?? UserProgress()
-        if userProgresses.isEmpty {
-            modelContext.insert(progress)
-        }
+        guard completed else { return }
+
+        let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
         let history = SessionHistory(
             beanName: evaluation.beanName,
             roastLevel: evaluation.roastLevel,
             processLevel: evaluation.processLevel,
-            finalCategory: evaluation.tasteCategory.rawValue
+            finalCategory: selectedPrimaryCategory.rawValue
         )
+        modelContext.insert(history)
         progress.completedSessions.append(history)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed saving session history: \(error.localizedDescription)")
+        }
     }
 }

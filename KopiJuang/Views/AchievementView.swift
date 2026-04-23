@@ -7,10 +7,6 @@ import SwiftUI
 
 struct AchievementView: View {
     let evaluation: SensoryEvaluation
-    @Environment(\.dismiss) var dismiss
-    
-    // Untuk ke root view
-    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(spacing: 30) {
@@ -78,11 +74,8 @@ struct AchievementView: View {
 // Helper untuk reset NavigationStack
 struct NavigationUtil {
     static func popToRootView() {
-        let keyWindow = UIApplication.shared.connectedScenes
-            .filter({$0.activationState == .foregroundActive})
-            .compactMap({$0 as? UIWindowScene})
-            .first?.windows
-            .filter({$0.isKeyWindow}).first
-        keyWindow?.rootViewController?.dismiss(animated: true, completion: nil)
+        let defaults = UserDefaults.standard
+        let counter = defaults.integer(forKey: "dashboardResetCounter")
+        defaults.set(counter + 1, forKey: "dashboardResetCounter")
     }
 }

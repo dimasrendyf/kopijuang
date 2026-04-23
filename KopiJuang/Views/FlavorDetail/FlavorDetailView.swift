@@ -30,7 +30,11 @@ struct FlavorDetailView: View {
                     Text(flavor.isUnlocked ? flavor.name : "Terkunci")
                         .font(.largeTitle.bold())
                     
-                    if !flavor.isUnlocked {
+                    if flavor.isUnlocked {
+                        Text("Level: \(flavor.familiarityLevel) • Pernah dirasakan \(flavor.experienceCount)x")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
                         Text("Teruslah bereksplorasi untuk membuka notes ini.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
