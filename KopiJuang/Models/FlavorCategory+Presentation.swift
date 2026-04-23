@@ -36,15 +36,15 @@ extension FlavorCategory {
 
     var categoryBlurb: String {
         switch self {
-        case .sweet: "Manis alami, karamel, madu, vanila (tanpa gula tambahan)."
-        case .floral: "Bunga, teh floral, aromatik halus retronasal."
-        case .fruity: "Sitrun, buah, tropis, terang di lidah/ aroma."
-        case .sourFermented: "Asam terukur, fermentasi, winey, alkohol lembut."
-        case .greenVegetative: "Hijau, herbal, zaitun, kacang mentah, vegetal."
-        case .other: "Asing ringan: kertas, bumi, lembab, kimia ringan (dokumentasi, bukan cap buruk)."
-        case .roasted: "Panggang, sereal, aspal, tembakau, sangrai."
-        case .spices: "Cengkih, pala, kayu manis, lada, rempah kering."
-        case .nuttyCocoa: "Kacang, biji, kakao, cokelat, almond."
+        case .sweet: "Manis alami seperti gula tebu, karamel, madu, hingga vanila."
+        case .floral: "Karakter bunga, teh, dan nuansa floral yang halus."
+        case .fruity: "Segar dan cerah dengan aksen buah sitrun maupun tropis."
+        case .sourFermented: "Kompleksitas asam, fermentasi, winey, hingga nuansa alkoholik."
+        case .greenVegetative: "Karakter hijau, herbal, zaitun, dan kacang mentah."
+        case .other: "Catatan anomali: kertas, tanah, atau kesan kimiawi (objektif)."
+        case .roasted: "Profil sangrai, sereal, asap, hingga tembakau."
+        case .spices: "Rempah kering seperti cengkih, pala, kayu manis, dan lada."
+        case .nuttyCocoa: "Gurih kacang-kacangan, biji-bijian, serta intensitas kakao atau cokelat."
         }
     }
 }

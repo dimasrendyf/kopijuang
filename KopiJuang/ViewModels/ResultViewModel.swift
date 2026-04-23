@@ -24,8 +24,7 @@ final class ResultViewModel {
     }
 
     var brewTipInsight: String {
-        let e = BrewHeuristics.expectation(roast: evaluation.roastLevel, process: evaluation.processLevel)
-        return "Kisaran tipikal untuk \(evaluation.roastLevel) + \(evaluation.processLevel): asam \(e.acidity), manis \(e.sweetness), pahit \(e.bitterness), body \(e.body) (1–10, perkiraan saja)."
+        BrewHeuristics.softTypicalLine(roast: evaluation.roastLevel, process: evaluation.processLevel)
     }
 
     var brewTipAction: String {
@@ -39,7 +38,7 @@ final class ResultViewModel {
     ) {
         selectedCategory = category
         isCorrect = true
-        feedbackMessage = "\(category.rawValue) itu luas. Yuk lanjut, rasa turunan apa yang paling mendekati kopimu?"
+        feedbackMessage = "Kelompok \(category.rawValue) luas banget. Lanjut, pilih rasa turunan yang paling dekat—biar jurnal rasa kamu makin jelas, bukan cuma kategori besarnya saja."
 
         let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
         if !progress.unlockedPrimaryNotes.contains(category.rawValue) {

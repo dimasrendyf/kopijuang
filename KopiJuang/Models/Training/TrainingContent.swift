@@ -1,6 +1,6 @@
 //
 //  TrainingContent.swift
-//  Teks terstruktur: parafase prinsip pengecapan (SCA) & kosakata sensorik (WCR), bukan salinan utuh.
+//  Teks terstruktur: panduan sensorik kopi (bukan salinan hak cipta).
 //
 
 import Foundation
@@ -12,287 +12,287 @@ struct TrainingContentBlock: Sendable {
     let reference: String
 }
 
-/// Materi per pasangan (kategori L1, tahap discovery). Ringkas; tidak menyalin peta resmi 1:1.
+/// Materi per pasangan (kategori L1, tahap discovery).
 enum TrainingContent {
     static func block(category: FlavorCategory, stage: DiscoveryStage) -> TrainingContentBlock {
         switch (category, stage) {
         case (.sweet, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Rujuk aroma kering: cari sinyal gula, karamel, madu sebelum cairan.",
-                lead: "Di fase kering, manis tercium sebagai gula, sirop ringan, atau karamel. Bedakan dari cokelat sangrai murni.",
+                stageIntro: "Saat biji masih kering, fokuslah mencari karakter manis—seperti karamel, gula aren, atau madu—sebelum air mengubah profil aromanya.",
+                lead: "Manis kering umumnya hadir dengan kesan gula sangrai atau madu. Bedakan ini dari aroma roti panggang atau cokelat yang cenderung lebih gurih.",
                 steps: [
-                    "Cium bubuk/beans kering 2–3 kali, jeda biar reseptor reset.",
-                    "Tulis satu kata: karamel, gula panggang, atau vanila—tanpa menebak proses biji dulu."
+                    "Hirup aroma 2–3 kali, beri jeda. Jika hidung terasa lelah, istirahat sejenak sebelum mencoba kembali.",
+                    "Catat satu kata kunci: misal karamel, gula aren, atau vanila. Belum perlu menebak proses pasca-panen biji."
                 ],
-                reference: "Praktik pengecapan: cium dry sebelum rasa; kelompok manis sering terpisah dari nut/cocoa saat memungkinkan."
+                reference: "Pada tahap awal (dry), kelompok rasa manis sering muncul sebelum karakter kacang atau cokelat mendominasi."
             )
         case (.sweet, .aroma):
             TrainingContentBlock(
-                stageIntro: "Setelah air, manis penguapan sering tajam; bandingkan dengan fase kering.",
-                lead: "Wet: madu, vanila, karamel, brown sugar. Catat apakah manis tampil lebih lebar dari dry.",
+                stageIntro: "Setelah seduhan, uap air akan membawa profil manis yang lebih kompleks. Catat setiap perubahan sensasi yang muncul.",
+                lead: "Uap air sering menonjolkan notes brown sugar, vanila, atau santan ringan. Apakah rasa manis di hidung terasa lebih 'mengembang' dibandingkan saat kering tadi?",
                 steps: [
-                    "Cium di atas cangkir (uap) tanpa menilai penuh di lidah dulu.",
-                    "Banding satu kunci: dry tipis vs wet yang menggembang."
+                    "Hirup aroma dari tepi cangkir terlebih dahulu, tanpa mencoba menebak profil rasa di lidah.",
+                    "Bandingkan: Apakah aromanya terasa lebih lega, stabil, atau justru menyempit dibandingkan saat kering?"
                 ],
-                reference: "Pembedaan dry/wet: latihan naris standar; penguapan panas menonjolkan gula panggang / sirop."
+                reference: "Perbedaan aroma antara fase kering dan basah adalah wajar karena air membawa senyawa volatil berbeda ke hidung."
             )
         case (.sweet, .taste):
             TrainingContentBlock(
-                stageIntro: "Di mulut, manis = bulat, finish, bukan gula tabel; gunakan retronasal.",
-                lead: "Slurry menyebar: perhatikan penuh di tengah, aftertaste manis tipis, sering setelah asam depan.",
+                stageIntro: "Manis pada kopi jarang bersifat tajam seperti gula meja. Fokuslah pada rasa penuh (body) di tengah lidah atau sisa rasa manis setelah asam memudar.",
+                lead: "Lakukan *slurp*, tahan sebentar, lalu hembuskan lewat hidung (retronasal). Cari lapisan manis yang halus, bukan sekadar rasa gula yang menempel.",
                 steps: [
-                    "Slurp, tahan, hembus retronasal; catat sisa manis di langit-langit.",
-                    "Banding: manis yang bertahan vs yang tertutup pahit."
+                    "Seruput sedikit, rasakan di bagian tengah lidah, lalu hembuskan secara retronasal. Catat apakah manisnya menetap, memudar, atau tertutup rasa pahit.",
+                    "Bandingkan: Rasa saat di tengah cangkir dengan 10 detik setelah diteguk (*finish*)."
                 ],
-                reference: "Keseimbangan rasa: dokumentasi dulu, skor kemudian—selaras leksikon sensorik umum."
+                reference: "Keseimbangan rasa tidak harus selalu rata. Dokumentasikan temuan Anda terlebih dahulu sebelum memberikan penilaian."
             )
 
         case (.floral, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: kelopak, serbuk sari, teh floral; hindari sisa wewangian pribadi.",
-                lead: "Aroma bunga sering tajam dan tipis di depan; mudah tersapu bila gandum sangrai dominan.",
+                stageIntro: "Aroma bunga saat fase kering cenderung halus dan berada di depan hidung, seringkali tertutup jika aroma *roasty* lebih dominan.",
+                lead: "Cari aroma seperti melati, mawar, atau *pollen*. Fokus pada kesan tajam yang ringan, bukan karakter buah yang berat.",
                 steps: [
-                    "Cium tipis, jaga jarak jika cangkir panas.",
-                    "Cari analogi: melati, mawar, elderflower, tanpa wajib nama botani."
+                    "Jaga jarak aman dari cangkir. Jangan menahan napas terlalu lama di atas cangkir.",
+                    "Gunakan deskripsi kiasan jika perlu: melati, mawar, atau 'teh mekar'—tidak wajib menggunakan nama varietas spesifik."
                 ],
-                reference: "Kelompok floral terpisah dari buah: latihan kering membantu membedakan volatil tipis."
+                reference: "Gugus bunga sering muncul jelas saat biji kering. Latih diri untuk memisahkan karakter floral dari notes buah."
             )
         case (.floral, .aroma):
             TrainingContentBlock(
-                stageIntro: "Bloom: floral sering naik lalu mengecil; catat arah perubahan.",
-                lead: "Uap: bunga muda, serbuk, teh yang floral; cek sisi samping cangkir.",
+                stageIntro: "Setelah *bloom*, aroma bunga seringkali lebih terekspos, namun bisa juga berubah atau meredup. Perhatikan arah perubahannya.",
+                lead: "Uap air membawa wangi bunga, teh, atau serbuk sari. Coba hirup dari sisi cangkir untuk mendapatkan persepsi yang berbeda.",
                 steps: [
-                    "Tulis: naik, sama, atau surut setelah ±30 dtk.",
-                    "Banding cium tengah cangkir vs sisi, aliran uap beda sering muncul."
+                    "Catat perubahannya: Apakah aromanya meningkat, stabil, atau melemah setelah 30 detik? Pilih satu yang paling dominan.",
+                    "Bandingkan aroma dari pusat cangkir dan sisi cangkir agar persepsi retronasal tidak bias oleh posisi."
                 ],
-                reference: "Suhu dan waktu mengubah volatil aromatik: normal bila puncak lalu rontok."
+                reference: "Penurunan suhu cairan akan mengubah profil aroma; ini adalah hal normal dalam proses cupping."
             )
         case (.floral, .taste):
             TrainingContentBlock(
-                stageIntro: "Lidah: floral dominan retronasal, bukan sisa garam/manis saja.",
-                lead: "Setelah teguk, hembus dari hidung belakang: ‘bunga’ muncul sebagai nuansa, bukan tekstur kasar di lidah.",
+                stageIntro: "Karakter bunga di mulut biasanya terdeteksi lewat *retronasal* (rongga belakang), bukan melalui tekstur di depan lidah.",
+                lead: "Seruput, tahan, dan hembuskan perlahan. Bunga seringkali muncul sebagai nuansa halus, bukan tekstur yang tebal.",
                 steps: [
-                    "Slurp kecil, lalu 2 sengatan napas retronasal singkat.",
-                    "Satu kata: finish floral vs asam buah di depan."
+                    "Lakukan dua hembusan *retronasal* singkat setelah seruputan pertama.",
+                    "Bandingkan: Sensasi bunga yang lembut di belakang dengan rasa asam buah di depan lidah."
                 ],
-                reference: "Retronasal membawa aroma melalui faring; bantu membedah floral vs fruity."
+                reference: "Teknik *retronasal* membantu memisahkan karakter bunga yang halus di belakang dengan rasa tajam buah di depan."
             )
 
         case (.fruity, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: sitrus, berry, tropis sering tajam (ester) sebelum cairan.",
-                lead: "Cium jarak sedang: sitrun/apel sering paling dulu, tropis bisa mengikut setelah pemanasan ringan di telapak.",
+                stageIntro: "Notes sitrus, beri, atau tropis sering muncul cepat, mirip ester yang menguap sebelum cairan terseduh penuh.",
+                lead: "Hirup dari jarak yang cukup. Sitrus atau apel muda sering muncul lebih awal, sementara karakter tropis mungkin muncul saat cangkir mulai hangat.",
                 steps: [
-                    "Dua cium: cepat vs tahan—lihat sinyal mana yang ditarik dulu.",
-                    "Catat: kulit sitrus vs daging buah, tanpa wajib varietas."
+                    "Bandingkan: Hirupan cepat vs tahan, untuk melihat aroma mana yang lebih dulu tertangkap.",
+                    "Bedakan antara 'kulit sitrus' dengan 'daging buah'—tidak perlu menebak varietas spesifik saat ini."
                 ],
-                reference: "Segar/ester di dry acuan varietas & proses; cukup catat keberadaan."
+                reference: "Sinyal pada fase kering membantu menentukan arah profil, bukan laporan lengkap dari kebun kopi."
             )
         case (.fruity, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: buah sering lebih jelas, kadang pindah ke sitrus/berry setelah uap naik.",
-                lead: "Setelah air, ester cenderung muncul; banding sebelum/ sesudah cairan turun sekitar 50°C bila sempat.",
+                stageIntro: "Uap air mendorong profil buah tampil lebih penuh. Kadang terjadi pergeseran, misalnya dari sitrus tajam menjadi jeruk yang lebih lembut.",
+                lead: "Bandingkan aroma saat baru dituang dengan setelah 30–50 detik. Suhu turun akan mengubah profil, dan itu wajar.",
                 steps: [
-                    "Cium tiga kali berjeda, catat puncak tajam terakhir sebelum naris lelah (fatigue).",
-                    "Banding: uap tengah vs sisi setelah 1 menit."
+                    "Hirup tiga kali dengan jeda. Jika hidung lelah, berhentilah sejenak.",
+                    "Bandingkan aroma pusat cangkir vs samping untuk mencari titik intensitas tertinggi."
                 ],
-                reference: "Suhu cairan memengaruhi profil uap: selaras pengecapan piala, bukan nilai abadi."
+                reference: "Suhu yang turun menyebabkan pergeseran volatilitas senyawa. Cukup catat perjalanannya, tidak perlu mencari satu nilai absolut."
             )
         case (.fruity, .taste):
             TrainingContentBlock(
-                stageIntro: "Lidah: asam seger + buah sering sejalan; retronasal buah setelah asam depan.",
-                lead: "Sip: sitrus depan, berry tengah, tropis sisi belakang—beda sisi, bukan lomba nama.",
+                stageIntro: "Profil buah sering berjalan seiring dengan asam: buah terdeteksi lewat *retronasal*, sedangkan asam bekerja di sisi lidah.",
+                lead: "Saat diseruput: depan terasa tajam (sitrus), tengah beri, dan belakang tropis. Fokuslah pada notes yang paling jelas.",
                 steps: [
-                    "Slurp keras sekali; aerosol penuh membantu lidah+hidung belakang.",
-                    "Banding: depan tajam vs tengah gula buah."
+                    "Lakukan *slurp* yang rapi untuk menciptakan aerosol; jangan menahan napas agar lidah dan hidung belakang saling bekerja.",
+                    "Bandingkan: Serangan rasa tajam di depan vs kemanisan daging buah di tengah."
                 ],
-                reference: "Buah = deskripsi rasa; asam = struktur—keduanya dipetakan tapi perannya beda."
+                reference: "Anggap 'buah' sebagai deskriptor rasa, dan 'asam' sebagai struktur jaringan kopi. Keduanya saling melengkapi."
             )
 
         case (.sourFermented, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: asam volatile ringan, winey, buah terferment; bedakan dari cuka pekat dulu.",
-                lead: "Cium singkat: cuka tipis, anggur muda, buah setengah ferment—catat tajam di hidung vs rapi di lidah nanti.",
+                stageIntro: "Aroma *winey* atau fermentasi sering tajam. Bedakan: apakah ini asam segar yang menyenangkan, atau asam cuka yang menusuk tenggorokan?",
+                lead: "Hirup singkat. Jika terasa menusuk, klasifikasikan: apakah seperti cuka dapur, atau seperti ceri yang sangat matang? Catat, lalu verifikasi saat cairan di mulut.",
                 steps: [
-                    "Hindari menahan cium lama: reset napas antar sniff.",
-                    "Banding: asam pangan segar vs asam cuka ‘menusuk’."
+                    "Jangan hirup terus-menerus selama 10 detik. Istirahatkan indra penciuman Anda.",
+                    "Bandingkan: Asam pangan yang segar vs asam cuka yang tajam jika keduanya muncul bersamaan."
                 ],
-                reference: "Winey/ferment: kelompok tersendiri; dokumentasi dulu, diagnosis proses nanti."
+                reference: "Catat impresi *winey* terlebih dahulu. Sumbernya akan lebih jelas didiskusikan setelah pola rasa keseluruhan terbentuk."
             )
         case (.sourFermented, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: penguapan naik; winey atau alkohol muda kadang muncul.",
-                lead: "Uap panas: cek tajam yang menusuk tenggorok vs tajam segar buah. Yang pertama hati-hati defect asetat, yang kedua ciri ferment/karakter.",
+                stageIntro: "Uap panas sering mengangkat sisa aroma anggur atau fermentasi. Catat sensasinya tanpa langsung membuat kesimpulan mengenai proses.",
+                lead: "Cium dari sisi lalu tengah. Jika terasa menusuk, bedakan: apakah itu asam cuka atau asam sitrun yang tajam? Yang kasar perlu diwaspadai, yang cerah adalah ciri khas.",
                 steps: [
-                    "Cium dari sisi, lalu tengah, beda sirkulasi uap.",
-                    "Catat: kontras dry (tipis) vs wet (lebar/alkohol) bila muncul."
+                    "Amati tren: Apakah aroma yang tadinya sempit melebar saat basah, atau tiba-tiba menjadi tajam?",
+                    "Beri jeda, lalu hirup kembali setelah 30 detik—seringkali ketajaman akan mereda."
                 ],
-                reference: "Banyak senyawa volatil baru saat basah; jangan memvonis per sniff tunggal."
+                reference: "Volatilitas senyawa saat uap air sangat dinamis; ulangi proses hirup dengan tenang."
             )
         case (.sourFermented, .taste):
             TrainingContentBlock(
-                stageIntro: "Mulut: asam = struktur; ferment = panjang, winey, tanpa sengat tenggorok.",
-                lead: "Sip: rasa asam alami (malat/sitrat) vs asetat; sirkulasikan, lalu cek sisa 5 dtk setelah teguk.",
+                stageIntro: "Asam di mulut adalah struktur rasa. Fermentasi atau *winey* yang baik seharusnya panjang, tanpa meninggalkan rasa tidak nyaman di tenggorokan.",
+                lead: "Rasakan: asam alami (seperti apel/jeruk) vs asetat yang mengikat tenggorokan. Asam asetat cenderung menusuk, asam alami lebih mengisi sisi lidah.",
                 steps: [
-                    "Tengah lidah dulu, baru belakang; tulis cukup satu sisi bila bingung.",
-                    "Banding: segar vs cuka; yang menyengat tajam cenderung jebakan defect."
+                    "Fokus pada area tengah, samping, dan belakang lidah. Pilih satu yang paling dominan.",
+                    "Bandingkan: Segar yang menyenangkan vs tajam yang mengganggu. Evaluasi ulang jika rasa tajamnya tidak wajar."
                 ],
-                reference: "Praktik pengecapan: acidity positif; defect asetat beda ciri bila tajam hancurkan rasa."
+                reference: "Asam yang berkualitas berbeda dengan defek; defek cenderung tajam destruktif, bukan tajam ceria."
             )
 
         case (.greenVegetative, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: polong, rumput, zaitun muda, herba; sering tajam di depan.",
-                lead: "Cium pendek: sayuran mentah, daun, snap pea; jangan paksakan cokelat bila sinyal hijau jelas.",
+                stageIntro: "Aroma hijau (rumput, polong, zaitun) terasa tajam di depan, berbeda dengan lemak cokelat yang lebih penuh di tengah.",
+                lead: "Hirup pendek: apakah tercium sayur mentah/buncis atau tumpukan cokelat? Jika hijau dominan, akui sebagai hijau, jangan dipaksakan ke arah cokelat.",
                 steps: [
-                    "Banding: serat ‘hijau’ vs lemak ‘biji’.",
-                    "Bila tersedia, panas ringan di tangan biji hati-hati—opsional, bukan wajib."
+                    "Bandingkan: Karakter serat hijau vs gurih panggang.",
+                    "Boleh hangatkan biji sebentar di tangan untuk membantu pelepasan aroma, bukan untuk menyangrai lebih jauh."
                 ],
-                reference: "Vegetal vs nut: beda cincin; underdeveloped kadang tumpang, catat saja bila bingung."
+                reference: "Vegetal dan panggang seringkali tumpang tindih. Cukup catat; bahasan mengenai *underdevelopment* baru dilakukan jika rasa tajamnya mengganggu."
             )
         case (.greenVegetative, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: rumput, zaitun, kacang polong; sering tajam tapi sempit.",
-                lead: "Penguapan: cek ‘hijau muda’ vs gandum sangrai; gelegas kadang memunculkan herba lalu rontok.",
+                stageIntro: "Aroma rumput atau buncis pada uap air seringkali tajam di awal lalu luntur. Jangan langsung memvonisnya sebagai defek.",
+                lead: "Perhatikan: Apakah aroma hijau ini sangat tipis atau bercampur dengan bau gandum panggang? Uap sering membawa buncis yang muncul sekilas lalu hilang.",
                 steps: [
-                    "Catat puncak uap: muncul awal lalu hilang cepat atau tidak.",
-                    "Banding wet vs kering, mana yang tajam lebih dulu."
+                    "Catat tren: Apakah aroma tajam di uap ini menetap atau menurun?",
+                    "Bandingkan aroma fase kering vs basah untuk melihat di mana karakter tajam pertama kali muncul."
                 ],
-                reference: "Senyawa ‘hijau’ sering puncak awal, surut—bentuk kurva itu yang berguna didokumentasikan."
+                reference: "Senyawa hijau yang muncul lalu luntur membentuk kurva tren, bukan sekadar nilai angka."
             )
         case (.greenVegetative, .taste):
             TrainingContentBlock(
-                stageIntro: "Lidah: vegetal, zaitun, retronasal herba; suhu netral ~50–60°C sering membeda rasa sisi pahit.",
-                lead: "Sip: tengah (polong) vs belakang (herba, celery); sisa 10 dtk: hijau tua vs segar muda beda sisi pahit.",
+                stageIntro: "Notes sayur atau herba sering tercerna dengan baik pada suhu 50–60°C. Jangan terlalu terburu-buru saat mencicipi.",
+                lead: "Saat diseruput: tengah mirip polong, belakang herbal, sisa rasa 10 detik mungkin hijau tua ke langit-langit. Perhatikan posisi rasa di mulut.",
                 steps: [
-                    "Slurp ketiga lebih kecil untuk sisa mouthfeel/finish.",
-                    "Banding: brightness depan vs vegetal belakang, tanpa lomba skor."
+                    "Lakukan seruputan ketiga, fokus pada *aftertaste*. Apakah mulut terasa bersih, halus, atau sepat?",
+                    "Bandingkan: Ketajaman di depan vs sisa herba di belakang."
                 ],
-                reference: "Retronasal herba tumpang rasa: pisahkan dari rempah tengah bila tercium tajam tersendiri."
+                reference: "Posisi *herb* dan rempah di mulut berbeda. Jujurlah dengan deskripsi, jangan memaksakan label jika tidak ada."
             )
 
         case (.other, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: kertas, bumi, lembab, kimia lemah—dokumentasi, bukan cap buruk dulu.",
-                lead: "Cium tipis: karton, kertas giling, bau lembab ruang, bukan cokelat/buah/bunga. Yang tidak nempel ciri umum, sementara tampung di sini.",
+                stageIntro: "Jika tercium aroma kertas, lembab, atau kimia, catat sebagai jurnal awal sebelum menarik kesimpulan.",
+                lead: "Hirup perlahan. Tandai jika ada kesan kardus, lembab, karet, atau cairan pembersih. Cukup catat intensitas dan sifatnya, jangan terburu-buru memvonis cacat.",
                 steps: [
-                    "Jeda panjang antar cium; lelah hidung menyerupai taint bila terburu-buru.",
-                    "Tulis intensitas 1–10 bila mau, tanpa menebak sumber fasilitas."
+                    "Beri jeda panjang antar hirupan agar hidung tidak kelelahan dan memberikan penilaian bias.",
+                    "Boleh beri skala gangguan 1-10, tanpa perlu memutuskan defek hanya dari hirupan awal."
                 ],
-                reference: "Taint ringan: beda tajam vs landai; pengecapan fokus deskriptif, bukan gugatan."
+                reference: "Dalam pengecapan, temuan yang ganjil dideskripsikan terlebih dahulu; analisis sumber dilakukan setelah pola jelas."
             )
         case (.other, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: uap bawa lembab, kardus basah, bumi, kimia ringan; catat mengganggu vs hampir netral.",
-                lead: "Banding: ‘damp’ naik atau tajam kimia/lem plastik tipis. Satu sisi cukup bila pusing.",
+                stageIntro: "Uap air dapat membawa aroma apek, tanah, atau kimia samar. Cium dari samping lalu tengah untuk memetakan arah aroma.",
+                lead: "Bandingkan: Saat baru dituang vs setelah agak mendingin. Sifat aroma sering berubah seiring penurunan suhu.",
                 steps: [
-                    "Cium sisi lalu tengah, beda sirkulasi uap di ceruk cangkir.",
-                    "Setelah 1 menit, cek apakah tajam tenggelam—bentuk tren penting, bukan nilai tunggal."
+                    "Setelah 1 menit, hirup kembali: jika aroma tajam mereda atau berpindah, catat trennya.",
+                    "Catat intensitas (tajam, datar, atau menusuk) tanpa perlu memaksakan tebakan sumber."
                 ],
-                reference: "Aroma taint/asing: cukup catat; menebak sumber fasilitas bukan tujuan latihan awal."
+                reference: "Uap membawa senyawa yang dinamis; satu kali hirup jarang cukup untuk mendapatkan gambaran lengkap."
             )
         case (.other, .taste):
             TrainingContentBlock(
-                stageIntro: "Lidah: retronasal asing, kertas, bumi, kimia; sisa tajam vs datar.",
-                lead: "Sip: beda sisa ‘asing’ (pinggir) vs tengah. Catat sisa, bukan solusi blend.",
+                stageIntro: "Sensasi retronasal mungkin membawa kesan kertas, tanah, atau kimia. Catat posisi sensasi di mulut tanpa langsung memvonis defek.",
+                lead: "Teguk sedikit, hembuskan. Bedakan apakah sisa rasa asing di pinggir lidah atau tengah—ini membantu membedakan kasar/halus.",
                 steps: [
-                    "Slurp kecil, lalu 2x hembusan retronasal singkat.",
-                    "Banding: aftertaste bersih vs dempul kertas bila tercium."
+                    "Lakukan dua hembusan retronasal pendek setelah seruputan singkat.",
+                    "Bandingkan: *Aftertaste* yang bersih vs yang tercemar kesan kertas atau tanah."
                 ],
-                reference: "Mouthfeel + retronasal: pengalaman taint sering tercampur, tidak wajib masuk papan satu label."
+                reference: "Seringkali kesan *taint* tercampur dengan *mouthfeel*. Deskripsikan apa yang dirasakan, jangan terburu memberikan label."
             )
 
         case (.roasted, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: malt, sereal, gandum sangrai; asap tipis; beda cokelat panggang vs karamel murni.",
-                lead: "Cium: biji panggang, roti, cokelat panggang ringan—bukan gula tajam murni.",
+                stageIntro: "Fase kering: gandum panggang, roti, malt, atau asap tipis. Bedakan ini dengan karakter karamel murni.",
+                lead: "Hirup aroma biji, sereal, atau kulit roti. Jika muncul rasa manis, tanyakan: apakah manis karamel, atau hanya rasa hangat sangrai?",
                 steps: [
-                    "Banding: ‘panggang biji’ vs nanti manis cair bila muncul di wet.",
-                    "Catat: asap tipis; bila aspek sangrai tajam, bedakan dari tumpukan buah/ferment."
+                    "Bandingkan 'panggang biji' dengan rasa manis yang mungkin muncul di fase basah.",
+                    "Catat jika ada asap tipis. Jika menusuk, bedakan dengan aroma buah atau ferment; jangan terburu-buru menuduh defek."
                 ],
-                reference: "Roasted vs nut/cocoa sering tumpang; pilah sereal/aspal vs biji/almond/cokelat lemak."
+                reference: "Karakter sangrai sering tumpang tindih dengan kacang atau cokelat. Bedakan antara sereal/aspal dengan lemak kacang."
             )
         case (.roasted, .aroma):
             TrainingContentBlock(
-                stageIntro: "Uap: reaksi Maillard, malt, cokelat panggang; banding tajam vs manis cair uap buah.",
-                lead: "Cek: ‘bakar’ tajam di hidung, atau hangat tengah sereal. Tajam tenggorok vs tajam depan wajar—catat sisi, bukan label defect sekali cium.",
+                stageIntro: "Uap mengangkat aroma reaksi Maillard: malt, roti, cokelat sangrai. Ini berbeda dengan aroma manis buah saat kopi masih panas.",
+                lead: "Hirup: Apakah hangat sereal di tengah, atau tajam 'bakar' di hidung? Ketajaman tenggorokan berbeda dengan tajam di depan.",
                 steps: [
-                    "Banding awal uap vs setelah 40 dtk, puncak panggang sering pindah.",
-                    "Banding: cokelat panggang vs cokelat lemak/almond (nut)."
+                    "Bandingkan awal uap vs 40 detik kemudian; puncak aroma panggang sering bergeser.",
+                    "Bandingkan: Cokelat sangrai dengan cokelat lemak atau almond (*nut*) jika keduanya menonjol."
                 ],
-                reference: "Suhu cairan turun: profil panggang berubah; jangan memvonis hanya saat panas."
+                reference: "Saat cairan mendingin, profil panggang akan berubah. Jangan menilai hanya pada saat suhu masih terlalu panas."
             )
         case (.roasted, .taste):
             TrainingContentBlock(
-                stageIntro: "Mulut: cita panggang, sereal, aspal, asap ringan; beda pahit sangrai vs pahit buah/alkali.",
-                lead: "Sip: tengah (malt) vs belakang (asap tipis) vs tengah pahit. Aftertaste: panggang tahan vs pudar bantu mencerahkan.",
+                stageIntro: "Di mulut: sereal, malt, asap ringan, atau aspal. Bedakan pahit sangrai dengan pahit buah atau pahit bikarbonat.",
+                lead: "Seruput: tengah (malt) vs belakang (asap) vs tengah (pahit). Perhatikan sisa rasa 10 detik: panggang menetap atau lenyap?",
                 steps: [
-                    "Tiga slurp: pertama struktur, kedua tengah, ketiga sisa 10 dtk setelah teguk.",
-                    "Banding: pahit tengah tajam vs cokelat tengah tahan; tulis cukup satu sisi tumpang."
+                    "Lakukan tiga seruputan berurutan: fokus pada bentuk rasa, tengah, dan sisa.",
+                    "Bandingkan: Pahit tengah yang tajam vs cokelat panggang yang tahan lama."
                 ],
-                reference: "Pahit: banyak sumber; sangrai tajam tumpang manis—fokus pada bentuk, bukan angka ajaib."
+                reference: "Pahit memiliki banyak sumber. Sangrai tajam sering menutupi rasa manis; catat bentuk rasanya, bukan sekadar angka."
             )
 
         case (.spices, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: lada, cengkih, pala, bumbu kering; sering tajam sempit di ujung hidung.",
-                lead: "Cium: rempah tajam, bukan herba rimbun (hijau) dan bukan cokelat tumpuk (kakao) saja—beda tajam ujung vs belakang lemak.",
+                stageIntro: "Fase kering: lada, cengkih, pala. Terasa tajam di ujung hidung, berbeda dengan herba rimbun (hijau) atau cokelat.",
+                lead: "Hirup: Rempah tajam, bukan daun lebar. Bedakan ketajaman di ujung hidung dengan gurih panggang di tengah.",
                 steps: [
-                    "Dua cium: cepat (depan) vs panjang (cengkih di belakang) bila muncul.",
-                    "Banding: bumbu kering vs jahe/akar (beda tajam)."
+                    "Dua hirupan: cepat lalu tahan. Cengkih sering muncul di belakang.",
+                    "Bandingkan: Rempah kering vs jahe atau akar (tajamnya berbeda)."
                 ],
-                reference: "Rempah vs herbal: beda tajam; leksikon umum memisah rempah kering/ panas bila memungkinkan."
+                reference: "Aroma rempah saat kering akan berbeda dengan saat uap. Latih diri memisahkan rempah dari herbal hijau."
             )
         case (.spices, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: rempah basah, cengkih, pala; uap sering mendorong tajam sempit tengah waktu.",
-                lead: "Penguapan panas: cengkih, pala, lada—beda cengkih depan vs hangat tengah, catat tren naik-turun.",
+                stageIntro: "Uap: rempah basah, cengkih, pala. Ketajaman seringkali sempit dan bergeser seiring waktu.",
+                lead: "Cium sisi lalu tengah. Aliran uap memindahkan fokus. Catat: Apakah tajam di awal lalu landai, atau sebaliknya?",
                 steps: [
-                    "Cium sisi, lalu tengah; sirkulasi uap memindahkan fokus retronasal ke ceruk cangkir.",
-                    "Banding: uap minit 0 vs setelah 50 dtk, sering tajam rempah landai lalu tajam lagi."
+                    "Bandingkan: Uap detik ke-0 vs detik ke-50—seringkali ada perubahan.",
+                    "Beri jeda antar hirupan agar indra tidak lelah."
                 ],
-                reference: "Uap panas memunculkan bumbu volatil; waktu cium penting, bukan sekali cicip."
+                reference: "Senyawa rempah memiliki volatilitas tinggi. Proses hirup yang berulang membantu membangun profil aroma."
             )
         case (.spices, .taste):
             TrainingContentBlock(
-                stageIntro: "Lidah: lada, cengkih, tajam belakang; beda tengah retronasal vs belakang panjang pedas rempah.",
-                lead: "Sip: rempah di tengah-belakang, sering tahan lalu sisa pedas halus, bukan sengat tenggorok.",
+                stageIntro: "Lidah: lada, cengkih. Tajam di tengah-belakang lidah, seringkali menetap lalu menyisakan rasa rempah halus, bukan sengatan kasar.",
+                lead: "Seruput, tahan, hembus retronasal. Cek: apakah cengkih (tengah) atau lada (tajam belakang) yang dominan?",
                 steps: [
-                    "Slurp, tahan, 2x hembusan retronasal; banding cengkih vs lada bila keduanya muncul.",
-                    "Banding: sensasi tahan lalu pudar di 10 dtk; catat tren, bukan nilai sempurna."
+                    "Dua hembusan retronasal setelah satu seruputan, bandingkan rasa tengah vs belakang.",
+                    "Catat: Sensasi yang menetap vs mereda dalam 10 detik. Ini adalah pola, bukan skor."
                 ],
-                reference: "Rempah vs pahit sangrai: posisi sisa dan tajam beda; dokumentasi membantu nanti."
+                reference: "Rempah vs pahit sangrai memiliki posisi *aftertaste* yang berbeda. Keduanya layak dideskripsikan."
             )
 
         case (.nuttyCocoa, .fragrance):
             TrainingContentBlock(
-                stageIntro: "Dry: kacang, biji, bubuk cokelat, almond—tanpa cairan penuh kesan ‘lemak’ biji mungkin muncul dulu lewat aroma.",
-                lead: "Cium: kacang panggang ringan, kakao, biji, tanpa wajib kopi cair dulu. Bedakan dari cokelat panggang (roasted) vs lemak/almond.",
+                stageIntro: "Fase kering: kacang, biji, kakao, almond. Aroma sering muncul lebih awal dibandingkan persepsi lemak di mulut.",
+                lead: "Hirup: Kacang panggang ringan, kakao, biji. Bedakan cokelat sangrai (panggang) dengan lemak kacang atau almond (nut).",
                 steps: [
-                    "Banding: ‘kacang kering’ vs ‘biji sangrai sereal’ (sering cenderung roasted, bukan nut).",
-                    "Catat: bulat tajam vs tajam sempit; nut/cocoa cenderung bulat tengah."
+                    "Bandingkan 'kacang kering' dengan 'biji sereal sangrai' (lebih ke arah sangrai).",
+                    "Catat: Apakah bulat di tengah atau tajam sempit? Kacang cenderung penuh di tengah, bukan menusuk."
                 ],
-                reference: "Nut/cocoa vs roasted: tumpang umum; peta latihan fokus kacang/lemak vs sereal/aspal."
+                reference: "Kacang dan cokelat sering tumpang tindih dengan sangrai. Fokuslah pada lemak biji."
             )
         case (.nuttyCocoa, .aroma):
             TrainingContentBlock(
-                stageIntro: "Wet: cokelat, hazelnut, almond, sering mid-body aromatik; uap bantu ‘lemak’ kacang naik.",
-                lead: "Uap: cokelat, susu kacang, almond—banding dry sempit vs wet yang lebih bulat, mid cenderung muncul setelah cairan stabil.",
+                stageIntro: "Uap: cokelat, hazelnut, almond. Seringkali muncul di tengah, setelah cairan tenang, lemak biji menjadi fokus.",
+                lead: "Bandingkan: Kering (sempit) vs basah (penuh). Kapan cokelat terasa paling jelas?",
                 steps: [
-                    "Cium tengah, lalu sisi; cokelat lemak sering tengah cangkir.",
-                    "Banding: wet vs dry; bulat lemak vs sinyal buah/ferment yang mungkin tumpang."
+                    "Hirup tengah lalu sisi. Cokelat lemak seringkali dominan di tengah, bukan hanya di bibir cangkir.",
+                    "Bandingkan basah vs kering: bulat lemak vs tajam buah atau ferment jika tumpang tindih."
                 ],
-                reference: "Lemak volatil naik saat penguapan: nut/cocoa sering puncak lalu rontok—catat tren, bukan sekali cicip."
+                reference: "Lemak volatil naik saat penguapan; catat tren perubahannya, bukan hanya sekali cicip."
             )
         case (.nuttyCocoa, .taste):
             TrainingContentBlock(
-                stageIntro: "Mulut: kacang, kakao, cokelat, almond; mid/after, beda pahit cokelat vs pahit buah/alkali.",
-                lead: "Sip: tengah, belakang, aftertaste; banding pahit cokelat vs pahit sangrai vs asam depan bila tercium tumpang.",
+                stageIntro: "Di mulut: kacang, kakao, cokelat, almond. Sering muncul di tengah lalu sisa. Pahit cokelat berbeda dengan pahit buah atau sangrai.",
+                lead: "Seruput, tahan, cek tengah dan belakang. Tanya: apakah pahit cokelat halus, pahit sangrai kasar, atau sisa asam buah?",
                 steps: [
-                    "3 slurp: tengah, belakang, sisa 10 dtk; tulis tengah lemak vs belakang cokelat.",
-                    "Banding: bulat mid vs kering/seret di akhir—catat, bukan skor sempurna."
+                    "Tiga teguk kecil, fokus tengah, belakang, dan sisa 10 detik. Catat mana yang paling penuh vs paling kering.",
+                    "Bandingkan: Penuh lemak di tengah vs seret pahit di ujung."
                 ],
-                reference: "Nut/cocoa vs roasted: tumpang umum; fokus pada rasa penuh lemak vs sereal/aspal."
+                reference: "Lemak cokelat yang bulat di tengah berbeda dengan karakter aspal atau sereal."
             )
         }
     }

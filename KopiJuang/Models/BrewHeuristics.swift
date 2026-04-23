@@ -1,6 +1,6 @@
 //
 //  BrewHeuristics.swift
-//  Ekspektasi kasar 1–10 per roast+proses + saran bila jauh dari kisaran (bukan kebenaran absolut).
+//  Estimasi profil sensorik (skala 1–10) berdasarkan roast dan proses. Saran adalah referensi, bukan aturan mutlak.
 //
 
 import Foundation
@@ -67,7 +67,19 @@ enum BrewHeuristics: Sendable {
         return s
     }
 
-    /// Paragraf saran next seduh: membandingkan skor user vs kisaran tipikal roast+proses.
+    /// Satu kalimat untuk layar hasil.
+    static func softTypicalLine(roast: String, process: String) -> String {
+        let r = roast.lowercased()
+        if r == "light" {
+            return "Untuk level sangrai \(roast) dengan proses \(process), profil asam biasanya lebih dominan, diikuti oleh kemanisan. Pahit cenderung minimal dengan *body* yang berada di rentang medium. Skala 1–10 ini adalah referensi umum, bukan patokan mutlak."
+        }
+        if r == "dark" {
+            return "Untuk level sangrai \(roast) dengan proses \(process), *body* dan kepahitan akan lebih menonjol, sementara tingkat keasaman cenderung rendah. Skala 1–10 ini digunakan untuk membantu Anda memahami pola rasa, bukan penilaian benar-salah."
+        }
+        return "Untuk level sangrai \(roast) dengan proses \(process), profil rasa (asam, manis, pahit) serta *body* biasanya berada dalam keseimbangan. Skala 1–10 ini merupakan acuan pengecapan, bukan target mutlak."
+    }
+
+    /// Paragraf saran seduhan.
     static func nextBrewGuidance(for evaluation: SensoryEvaluation) -> String {
         let e = expectation(roast: evaluation.roastLevel, process: evaluation.processLevel)
         let roast = evaluation.roastLevel
@@ -78,59 +90,56 @@ enum BrewHeuristics: Sendable {
         let bo = Int(evaluation.bodyScore.rounded())
 
         var lines: [String] = [
-            "Patokan tipikal untuk \(roast) + \(process) (bukan wajib): asam dalam \(e.acidity), manis \(e.sweetness), pahit \(e.bitterness), body \(e.body) pada skala 1–10."
+            "Berikut analisis hasil seduhan Anda untuk profil sangrai \(roast) dan proses \(process). Angka-angka ini adalah perbandingan dengan kebiasaan umum dalam pengecapan, bukan rumus kaku."
         ]
 
         if !e.acidity.contains(a) {
             if a < e.acidity.lowerBound {
                 lines.append(
-                    "Asam skor \(a) di bawah kisaran tipikal \(e.acidity). Sering: terlalu encer, suhu landai, atau giling terlalu kasar. Coba: perketat grind sedikit, naik suhu 1–2°C, atau pekatkan rasio—ubah satu variabel, banding slurp."
+                    "Skor keasaman: \(a) berada di bawah rata-rata. Hal ini sering terjadi jika ekstraksi kurang optimal (under-extracted) akibat gilingan yang terlalu kasar, suhu air rendah, atau rasio yang kurang tepat. Coba perhalus ukuran gilingan atau naikkan suhu air 1–2°C pada seduhan berikutnya."
                 )
             } else {
                 lines.append(
-                    "Asam skor \(a) di atas kisaran tipikal \(e.acidity). Coba: grind sedikit kasar, turun suhu 1–2°C, atau batasi waktu terekstraksi; cek pula apakah cangkir/ferment tajam alami."
+                    "Skor keasaman: \(a) terasa cukup tajam. Jika intensitasnya sudah tidak nyaman (menusuk), pertimbangkan untuk menggiling sedikit lebih kasar atau menurunkan suhu air 1–2°C. Pastikan juga kualitas biji tidak memiliki indikasi cacat fermentasi."
                 )
             }
         }
-
         if !e.sweetness.contains(sw) {
             if sw < e.sweetness.lowerBound {
                 lines.append(
-                    "Manis skor \(sw) jauh di bawah kisaran \(e.sweetness). Coba ekstraksi agak penuh (halus, suhu, waktu) atau tinjau cangkir bila proses alami: yang dicari bukan gula, tapi rasa penuh/bulat."
+                    "Skor kemanisan: \(sw) terasa kurang menonjol. Kemanisan dalam kopi adalah sensasi 'penuh' (fullness) di mulut. Jika terasa tipis, coba optimalkan variabel ekstraksi seperti suhu atau waktu kontak untuk meningkatkan intensitasnya."
                 )
             } else {
                 lines.append(
-                    "Manis skor \(sw) jauh di atas kisaran \(e.sweetness). Cek penuangan terlalu lama, rasio pekat, atau cangkir yang manis tajam; seimbangi dengan waktu/final yield."
+                    "Skor kemanisan: \(sw) terasa sangat menonjol. Ini bisa menjadi indikasi ekstraksi yang sangat baik, atau justru konsentrasi yang terlalu tinggi. Jika terasa terlalu intens, Anda bisa menyesuaikan *yield* atau waktu penuangan."
                 )
             }
         }
-
         if !e.bitterness.contains(b) {
             if b > e.bitterness.upperBound {
                 lines.append(
-                    "Pahit skor \(b) jauh di atas kisaran tipikal \(e.bitterness). Coba turun suhu, grind kasar sedikit, batasi waktu kontak, atau cegah over-extraction (gerakan, ukuran penuang)."
+                    "Skor kepahitan: \(b) berada di atas batas nyaman untuk profil ini. Untuk mengurangi indikasi *over-extraction*, coba turunkan suhu air, gunakan gilingan sedikit lebih kasar, atau perpendek waktu kontak air."
                 )
             } else {
                 lines.append(
-                    "Pahit skor \(b) jauh di bawah kisaran tipikal \(e.bitterness). Untuk roast gelap sering wajar; untuk terang–medium bisa berarti ekstraksi masih kurang atau cangkir memang rendah pahit—sesuaikan dengan profil yang kamu cari."
+                    "Skor kepahitan: \(b) terasa sangat rendah. Pada roast gelap, ini mungkin wajar. Namun, pada roast terang atau menengah, ini bisa mengindikasikan ekstraksi yang belum maksimal."
                 )
             }
         }
-
         if !e.body.contains(bo) {
             if bo < e.body.lowerBound {
                 lines.append(
-                    "Body skor \(bo) di bawah kisaran tipikal \(e.body). Coba grind halus sedikit, rasio agak pekat, atau waktu/sedikit lebih lama; pastikan cangkir/tekstur cairan sesuai."
+                    "Skor *body*: \(bo) terasa lebih encer dari ekspektasi. Coba gunakan gilingan yang sedikit lebih halus atau tingkatkan rasio kopi terhadap air (lebih pekat) untuk menambah tekstur pada cangkir Anda."
                 )
             } else {
                 lines.append(
-                    "Body skor \(bo) di atas kisaran tipikal \(e.body). Coba grind kasar, perpendek ekstraksi, atau cek apakah over-extract."
+                    "Skor *body*: \(bo) terasa cukup berat. Jika dirasa terlalu intens, coba giling sedikit lebih kasar atau kurangi waktu kontak untuk mendapatkan hasil yang lebih ringan."
                 )
             }
         }
 
         if lines.count == 1 {
-            return lines[0] + " Skor kamu cukup dekat kisaran—sesi berikut cukup ubah satu variabel (rasio, suhu, grind, atau waktu) agar bedanya terasa jelas."
+            return lines[0] + " Hasil seduhan Anda berada dalam rentang ekspektasi. Jika ingin bereksperimen, ubah satu variabel saja (seperti rasio atau ukuran gilingan) agar perubahan pada profil rasa lebih terukur."
         }
         return lines.joined(separator: "\n\n")
     }

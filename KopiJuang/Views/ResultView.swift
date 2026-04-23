@@ -243,13 +243,33 @@ struct FeedbackView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                Image(systemName: isCorrect ? "star.fill" : "lightbulb.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(isCorrect ? .yellow : .orange)
+                Image(systemName: isCorrect ? "party.popper.fill" : "lightbulb.fill")
+                    .font(.system(size: 72))
+                    .foregroundStyle(
+                        isCorrect
+                        ? AnyShapeStyle(
+                            LinearGradient(
+                                colors: [.orange, .pink, .yellow],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        : AnyShapeStyle(.orange)
+                    )
+                    .symbolEffect(.bounce, options: .repeating, isActive: isCorrect)
+                    .accessibilityLabel(isCorrect ? "Yey, cita rasa baru kebaca" : "Petunjuk")
 
-                Text(isCorrect ? "Brilliant!" : "Hampir tepat!")
-                    .font(.title.bold())
-                
+                VStack(spacing: 6) {
+                    Text(isCorrect ? "Kamu mengenali cita rasa baru!" : "Hampir tepat!")
+                        .font(.title.bold())
+                    if isCorrect {
+                        Text("Gitu dong—kamu baca nuansa, bukan cuma menebak label.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+
                 Text(message)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)

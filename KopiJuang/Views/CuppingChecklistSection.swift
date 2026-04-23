@@ -1,6 +1,6 @@
 //
 //  CuppingChecklistSection.swift
-//  Cek sebelum pengecapan: parafase praktik piala umum, tanpa klaim label resmi pihak ketiga.
+//  Cek sebelum pengecapan: panduan praktik sensorik standar.
 //
 
 import SwiftUI
@@ -11,23 +11,23 @@ struct CuppingChecklistSection: View {
     private static let pages: [(icon: String, title: String, detail: String)] = [
         (
             "gearshape.2.fill",
-            "Brewing & giling",
-            "Air ~92–96°C sesuai resep, giling konsisten. Terlalu halus: risiko pahit berlebih; terlalu kasar: cair encer, aroma sulit dibangun."
+            "Seduh & Giling",
+            "Gunakan suhu air ideal (sekitar 92–96°C). Pastikan konsistensi ukuran gilingan: gilingan yang terlalu halus memicu pahit berlebih, sementara gilingan terlalu kasar menghasilkan kopi yang encer dengan intensitas aroma rendah."
         ),
         (
             "drop.circle.fill",
-            "Palat netral",
-            "Teguk air sebelum cicip agar sisa rasa tadi tidak mengganggu. Palat jernih menolong beda tajam tipis, terutama fase asam/ferment."
+            "Bersihkan Lidah",
+            "Bilas lidah dengan air putih sebelum memulai. Menjaga kebersihan indra perasa membantu Anda menangkap nuansa rasa yang halus—terutama pada karakteristik asam atau fermentasi—dengan lebih akurat."
         ),
         (
             "thermometer.medium",
-            "Jendela suhu icip",
-            "Setelah dituang, cicip saat cairan turun ke kisaran netral cukup panas di mulut; terlalu panas mematikan sensasi, terlalu dingin menutup uap."
+            "Waktu Mencicip",
+            "Hindari mencicip saat kopi terlalu panas agar indra perasa tidak mati rasa. Biarkan suhu turun secara bertahap; aroma dan profil rasa akan lebih jelas terbaca saat suhu kopi hangat dan nyaman di lidah."
         ),
         (
             "mouth.fill",
-            "Slurp & retronasal",
-            "Seruput agar cairan menyebar di lidah; aroma naik retronasal. Latihan fokus: aroma vs rasa, bukan skor dulu."
+            "Slurp & Retronasal",
+            "Lakukan *slurp* untuk menyebarkan kopi ke seluruh permukaan lidah, lalu hembuskan napas secara retronasal. Fokuslah mendeskripsikan profil rasa terlebih dahulu sebelum memberikan penilaian skor."
         )
     ]
 
@@ -36,10 +36,9 @@ struct CuppingChecklistSection: View {
             DisclosureGroup(isExpanded: $isExpanded) {
                 TabView {
                     ForEach(Array(Self.pages.enumerated()), id: \.offset) { _, page in
-                        VStack(spacing: 16) {
-                            Spacer(minLength: 0)
+                        VStack(spacing: 14) {
                             Image(systemName: page.icon)
-                                .font(.system(size: 48))
+                                .font(.system(size: 44))
                                 .foregroundStyle(.brown)
                             Text(page.title)
                                 .font(.headline)
@@ -47,14 +46,15 @@ struct CuppingChecklistSection: View {
                                 .font(.subheadline)
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(.secondary)
-                                .padding(.horizontal, 8)
-                            Spacer(minLength: 0)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.horizontal, 12)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 12)
+                        .padding(.bottom, 36)
                     }
                 }
-                .frame(height: 220)
+                .frame(height: 320)
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
             } label: {
@@ -62,7 +62,7 @@ struct CuppingChecklistSection: View {
                     .font(.headline)
             }
         } footer: {
-            Text("Disarankan sesuai praktik pengecapan; sesuaikan alat, rasio, dan resep pribadimu.")
+            Text("Panduan ini disesuaikan dengan praktik pengecapan standar. Silakan sesuaikan kembali dengan parameter alat, rasio, dan metode seduh Anda.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
