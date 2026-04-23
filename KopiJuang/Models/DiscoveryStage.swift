@@ -20,14 +20,17 @@ enum DiscoveryStage: String, CaseIterable, Identifiable {
         }
     }
 
-    var learningPrefix: String {
+    var learningPrefix: String { learningLine }
+
+    /// Baris bantu (ID) di daftar belajar, digabung dengan nama kategori.
+    var learningLine: String {
         switch self {
         case .fragrance:
-            return "How to smell"
+            "Latihan cium (dry) untuk jenis rasa"
         case .aroma:
-            return "How to identify aroma"
+            "Latihan cium (wet/bloom) untuk jenis rasa"
         case .taste:
-            return "How to taste"
+            "Latihan retronasal & lidah (sip) untuk jenis rasa"
         }
     }
 }

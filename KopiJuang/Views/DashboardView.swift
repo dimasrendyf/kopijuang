@@ -9,7 +9,6 @@ import SwiftUI
 import SwiftData
 
 struct DashboardView: View {
-    @State private var viewModel = DashboardViewModel()
     @Query(sort: \SessionHistory.date, order: .reverse) private var allSessions: [SessionHistory]
     
     var completedSessions: [SessionHistory] {
@@ -17,8 +16,7 @@ struct DashboardView: View {
     }
     
     var body: some View {
-        @Bindable var viewModel = viewModel
-        return NavigationStack {
+        NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -52,7 +50,12 @@ struct DashboardView: View {
                                     .padding(.horizontal)
                             } else {
                                 ForEach(completedSessions) { session in
-                                    SessionRow(session: session)
+                                    NavigationLink {
+                                        SessionHistoryDetailView(session: session)
+                                    } label: {
+                                        SessionRowLabel(session: session)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -61,14 +64,6 @@ struct DashboardView: View {
                     .padding(.bottom, 90)
                 }
                 .navigationTitle("KopiJuang")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button { viewModel.showGuide = true } label: {
-                            Image(systemName: "questionmark.circle")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
                 
                 NavigationLink(destination: CoffeeSetupView()) {
                     Image(systemName: "plus")
@@ -82,16 +77,14 @@ struct DashboardView: View {
                 .padding(.trailing)
                 .padding(.bottom, 18)
             }
-            .sheet(isPresented: $viewModel.showGuide) {
-                MasterPrepGuideView(isFirstRun: false)
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
-struct SessionRow: View {
+struct SessionRowLabel: View {
     let session: SessionHistory
+
     var body: some View {
         HStack {
             Image(systemName: "checkmark.circle.fill")
@@ -102,6 +95,9 @@ struct SessionRow: View {
                 Text(session.finalCategory).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
         }
         .padding()
         .background(Color(.secondarySystemBackground))

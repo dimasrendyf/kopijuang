@@ -7,44 +7,68 @@ import SwiftUI
 
 struct DiscoveryNotesView: View {
     let stage: DiscoveryStage
+    var onCloseEntireSheet: (() -> Void)?
 
     private let categories = FlavorCategory.allCases
+
+    init(stage: DiscoveryStage, onCloseEntireSheet: (() -> Void)? = nil) {
+        self.stage = stage
+        self.onCloseEntireSheet = onCloseEntireSheet
+    }
 
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Aku Gak Yakin, Bantuin Dong")
-                        .font(.title3.bold())
-                    Text("Pilih notes yang ingin kamu pelajari. Materi akan menyesuaikan tahap \(stage.title.lowercased()).")
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Bantuan pengecapan")
+                        .font(.title2.bold())
+                    Text(footerCopy)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.vertical, 6)
+                .padding(.vertical, 4)
             }
             .listRowBackground(Color.clear)
 
-            Section("Belajar Notes") {
+            Section {
                 ForEach(categories) { category in
-                    NavigationLink(destination: TrainingView(flavor: category.rawValue, stage: stage)) {
+                    NavigationLink {
+                        TrainingView(
+                            category: category,
+                            stage: stage,
+                            onCloseEntireSheet: { onCloseEntireSheet?() }
+                        )
+                    } label: {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Belajar notes \(category.rawValue)")
+                            Text(category.rawValue)
                                 .font(.subheadline.weight(.semibold))
-                            Text("\(stage.learningPrefix) \(category.rawValue.lowercased())")
+                            Text("\(stage.learningLine) \(category.rawValue.lowercased())")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
+            } header: {
+                Text("Kelompok aroma & rasa")
+            } footer: {
+                Text("Daftar ini selaras peta kategori di latihan; bukan salinan peta resmi pihak ketiga.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("Discovery Notes")
-        .navigationBarTitleDisplayMode(.inline)
+        .listStyle(.insetGrouped)
+        .navigationTitle("Catatan pengecapan")
+        .navigationBarTitleDisplayMode(.large)
+    }
+
+    private var footerCopy: String {
+        "Pilih kelompok yang mau dilatih. Ringkasan mengikuti fase \(stage.title)—bandingkan dengan cangkirmu, lalu kembali ke form."
     }
 }
 
 #Preview {
     NavigationStack {
-        DiscoveryNotesView(stage: .taste)
+        DiscoveryNotesView(stage: .taste) {}
     }
 }

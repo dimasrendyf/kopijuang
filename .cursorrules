@@ -9,5 +9,6 @@ Rules:
 5. If the code is simple, don't over-engineer.
 6. Be terse. Be direct. If you don't know, say "I don't know".
 7. Prioritize performance and Apple HIG.
+8. Use gestalt theory in design
 
 "Want it always on?"

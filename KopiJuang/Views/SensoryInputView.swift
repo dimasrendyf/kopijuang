@@ -40,7 +40,6 @@ struct SensoryInputView: View {
                             intensity: $viewModel.fragranceIntensity,
                             category: $viewModel.fragranceCategory
                         )
-                        .onAppear { viewModel.onFragranceStepAppear() }
                     case .aroma:
                         AromaStepView(
                             dryCategory: viewModel.fragranceCategory,
@@ -270,7 +269,7 @@ private struct FragranceStepView: View {
         }
         .sheet(isPresented: $showDiscovery) {
             NavigationStack {
-                DiscoveryNotesView(stage: .fragrance)
+                DiscoveryNotesView(stage: .fragrance) { showDiscovery = false }
             }
         }
     }
@@ -382,7 +381,7 @@ private struct AromaStepView: View {
         }
         .sheet(isPresented: $showDiscovery) {
             NavigationStack {
-                DiscoveryNotesView(stage: .aroma)
+                DiscoveryNotesView(stage: .aroma) { showDiscovery = false }
             }
         }
     }
@@ -463,10 +462,10 @@ private struct TasteStepView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 StepIntroCard(
                     title: "Info tahap ini",
-                    message: "Kamu sedang menilai rasa saat diminum. Seruput perlahan, rasakan, lalu nilai intensitas tiap atribut."
+                    message: "Kamu menilai rasa saat diminum. Seruput perlahan, lalu isi skala; ini intensitas, bukan benar/salah."
                 )
                 SlurpMentorCard()
                 TasteBridgeCard(
@@ -476,11 +475,22 @@ private struct TasteStepView: View {
             }
             .padding(.horizontal)
 
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Intensitas pengecap")
+                    .font(.title3.bold())
+                Text("Geser 1 (rendah) – 10 (tinggi) untuk masing-masing atribut. Angka = seberapa menonjol, bukan gaya seduh.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
             VStack(spacing: 12) {
                 TasteMetricCard(
                     title: "Acidity",
-                    subtitle: "Sensasi segar/bright, bukan asam yang menusuk.",
-                    detail: "Acidity yang baik terasa hidup, bersih, dan rapi. Bayangkan karakter sitrus atau malic acidity seperti apel.",
+                    subtitle: "Segar/bright, bukan asam menusuk.",
+                    detail: "Yang rapi: hidup, bersih; bayangkan sitrus ringan atau malat seperti apel.",
                     value: $acidity,
                     range: 1...10,
                     step: 1,
@@ -490,8 +500,8 @@ private struct TasteStepView: View {
                 
                 TasteMetricCard(
                     title: "Sweetness",
-                    subtitle: "Manis alami kopi (bukan gula tambahan).",
-                    detail: "Sweetness bikin rasa terasa bulat dan nyaman. Semakin jelas manis alaminya, biasanya profil cup makin seimbang.",
+                    subtitle: "Manis alami (bukan gula tabel).",
+                    detail: "Membulatkan profil; semakin jelas, biasanya keseimbangan terasa enak ditelan.",
                     value: $sweetness,
                     range: 1...10,
                     step: 1,
@@ -501,8 +511,8 @@ private struct TasteStepView: View {
                 
                 TasteMetricCard(
                     title: "Bitterness",
-                    subtitle: "Rasa pahit yang muncul saat diteguk.",
-                    detail: "Bitterness ringan bisa menambah struktur, tapi bitterness berlebih biasanya menutup sweetness dan clarity rasa.",
+                    subtitle: "Pahit saat diteguk.",
+                    detail: "Pahit ringan bisa struktur; pahit menutup manis/klaritas wajar diberi skor sesuai sensasi.",
                     value: $bitterness,
                     range: 1...10,
                     step: 1,
@@ -512,29 +522,30 @@ private struct TasteStepView: View {
                 
                 TasteMetricCard(
                     title: "Body",
-                    subtitle: "Tekstur cairan di mulut (ringan ke tebal).",
-                    detail: "Body itu mouthfeel, bukan rasa. Tidak harus tebal; yang penting sesuai karakter kopi dan tetap nyaman diminum.",
+                    subtitle: "Mouthfeel (ringan–tebal).",
+                    detail: "Tekstur cairan, bukan wajib tebal; yang penting nyaman di mulut dan konsisten saat mendingin.",
                     value: $bodyScore,
                     range: 1...10,
                     step: 1,
                     lowText: "Ringan",
                     highText: "Tebal"
                 )
-                
-                InputCard(
-                    title: "Kesan Keseluruhan",
-                    prompt: "Setelah slurp, kategori rasa apa yang paling menggambarkan kopi ini secara keseluruhan?"
-                ) {
-                    CategoryPickerGrid(stage: .taste, selection: $category) {
-                        showDiscovery = true
-                    }
+            }
+            .padding(.horizontal)
+
+            InputCard(
+                title: "Kesan akhir (L1)",
+                prompt: "Pilih kelompok yang paling dominan setelah slurp, mengikuti 9 kategori peta latihan di atas."
+            ) {
+                CategoryPickerGrid(stage: .taste, selection: $category) {
+                    showDiscovery = true
                 }
             }
             .padding(.horizontal)
         }
         .sheet(isPresented: $showDiscovery) {
             NavigationStack {
-                DiscoveryNotesView(stage: .taste)
+                DiscoveryNotesView(stage: .taste) { showDiscovery = false }
             }
         }
     }
@@ -576,11 +587,11 @@ private struct TasteBridgeCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Eksplorasi Rasa (Taste)")
+            Label("Jembatan ke sensasi (roast + proses)", systemImage: "link")
                 .font(.headline)
                 .foregroundStyle(.brown)
 
-            Text("Berdasarkan roast \(roastLevel) dan process \(processLevel), karakter apa yang paling kamu rasakan sekarang?")
+            Text("Roast \(roastLevel) dan proses \(processLevel) cuma jembatan; cek kembali ke slurp, bukan teori.")
                 .font(.subheadline.weight(.medium))
 
             VStack(alignment: .leading, spacing: 6) {
@@ -592,35 +603,45 @@ private struct TasteBridgeCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(Color.brown.opacity(0.08))
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.brown.opacity(0.2), lineWidth: 1)
+                .stroke(Color.brown.opacity(0.32), lineWidth: 1)
         )
-        .cornerRadius(16)
     }
 }
 
 private struct SlurpMentorCard: View {
     var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "lightbulb.fill")
-                .font(.title)
-                .foregroundStyle(.yellow)
-                .frame(width: 38)
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: "tornado")
+                .font(.title2)
+                .foregroundStyle(.orange)
+                .frame(width: 36, height: 36)
+                .background(Color.orange.opacity(0.12))
+                .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Barista Tips: Slurping")
+                Text("Slurp & aerasi")
                     .font(.subheadline.bold())
-                Text("Seruput keras (aerasi). Kopi menyebar ke lidah + aroma naik ke hidung (retronasal).")
+                Text("Seruput cukup keras: cairan menyebar di lidah, aroma mendorong retronasal. Satu cangkir, beberapa slurp kecil, bukan tersedak.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(16)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.orange.opacity(0.35), lineWidth: 1)
+        )
     }
 }
 
@@ -685,6 +706,17 @@ private struct TasteMetricCard: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             
+            HStack {
+                Text("Skala saat ini")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(Int(value)) / 10")
+                    .font(.caption.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.brown)
+            }
+            .accessibilityElement(children: .combine)
+
             MetricScale(
                 value: $value,
                 range: range,
@@ -694,7 +726,11 @@ private struct TasteMetricCard: View {
             )
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color(.systemBackground))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.brown.opacity(0.22), lineWidth: 1)
+        )
         .cornerRadius(20)
     }
 }
@@ -882,17 +918,22 @@ private struct CategoryPickerGrid: View {
     
     var body: some View {
         VStack(spacing: 10) {
-            ForEach(FlavorCategory.allCases) { category in
-                categoryRow(category)
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(FlavorCategory.allCases) { category in
+                        categoryRow(category)
+                    }
+                }
             }
+            .frame(maxHeight: 520)
             unsureButton
         }
     }
     
     private func categoryRow(_ category: FlavorCategory) -> some View {
-        let descriptor = descriptorForStage(category)
+        let descriptor = CategoryPickerDescriptors.descriptor(for: category, stage: stage)
         let isSelected = selection == category
-        
+
         return Button {
             selection = category
         } label: {
@@ -902,7 +943,7 @@ private struct CategoryPickerGrid: View {
                         Circle()
                             .fill(Color.brown.opacity(isSelected ? 0.18 : 0.10))
                             .frame(width: 36, height: 36)
-                        Image(systemName: iconForCategory(category))
+                        Image(systemName: category.pickerGridIconName)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.brown)
                     }
@@ -948,10 +989,10 @@ private struct CategoryPickerGrid: View {
                 Image(systemName: "questionmark.circle")
                     .foregroundStyle(.secondary)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Aku gak yakin")
+                    Text("Butuh panduan?")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
-                    Text("Buka discovery notes untuk bantu kalibrasi \(stage.title.lowercased()).")
+                    Text("Buka catatan pengecapan: kelompok aroma/rasa dipetakan seperti di latihan.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -968,106 +1009,6 @@ private struct CategoryPickerGrid: View {
             )
         }
         .buttonStyle(.plain)
-    }
-    
-    private struct Descriptor {
-        let summary: String
-        let examples: [String]
-    }
-    
-    private func descriptorForStage(_ category: FlavorCategory) -> Descriptor {
-        switch stage {
-        case .fragrance:
-            return dryDescriptor(category)
-        case .aroma:
-            return wetDescriptor(category)
-        case .taste:
-            return sipDescriptor(category)
-        }
-    }
-    
-    private func dryDescriptor(_ category: FlavorCategory) -> Descriptor {
-        switch category {
-        case .floral:
-            return Descriptor(
-                summary: "Wangi bunga/teh yang manis-ringan (di hidung, dry).",
-                examples: ["Jasmine", "Rose", "Chamomile", "Black tea"]
-            )
-        case .fruity:
-            return Descriptor(
-                summary: "Wangi buah matang yang manis (di hidung, dry).",
-                examples: ["Citrus", "Berry", "Apple", "Grape"]
-            )
-        case .nutty:
-            return Descriptor(
-                summary: "Wangi kacang/cokelat “brown” (di hidung, dry).",
-                examples: ["Hazelnut", "Almond", "Cocoa"]
-            )
-        case .sweet:
-            return Descriptor(
-                summary: "Wangi manis: madu/vanila/karamel (di hidung, dry).",
-                examples: ["Honey", "Vanilla", "Caramel"]
-            )
-        }
-    }
-    
-    private func wetDescriptor(_ category: FlavorCategory) -> Descriptor {
-        switch category {
-        case .floral:
-            return Descriptor(
-                summary: "Floral sering makin kebaca saat bloom (wet).",
-                examples: ["Jasmine", "Rose", "Chamomile", "Black tea"]
-            )
-        case .fruity:
-            return Descriptor(
-                summary: "Buah segar makin “keluar” saat wet (citrus/berry).",
-                examples: ["Citrus", "Berry", "Tropical"]
-            )
-        case .nutty:
-            return Descriptor(
-                summary: "Nutty/cocoa muncul hangat saat wet.",
-                examples: ["Hazelnut", "Cocoa", "Brown sugar"]
-            )
-        case .sweet:
-            return Descriptor(
-                summary: "Sweet aromatics: karamel, gula merah, vanila (wet).",
-                examples: ["Brown sugar", "Caramel", "Vanillin"]
-            )
-        }
-    }
-    
-    private func sipDescriptor(_ category: FlavorCategory) -> Descriptor {
-        switch category {
-        case .floral:
-            return Descriptor(
-                summary: "Saat sip, floral kebaca via retronasal (bukan “di lidah”).",
-                examples: ["Jasmine", "Black tea"]
-            )
-        case .fruity:
-            return Descriptor(
-                summary: "Saat sip, fruity biasanya bareng acidity yang rapi.",
-                examples: ["Citrus", "Berry"]
-            )
-        case .nutty:
-            return Descriptor(
-                summary: "Saat sip, nutty/cocoa sering jadi mid-palate yang hangat.",
-                examples: ["Cocoa", "Almond"]
-            )
-        case .sweet:
-            return Descriptor(
-                summary: "Saat sip, sweet terasa sebagai roundness (bukan gula).",
-                examples: ["Honey", "Vanilla"]
-            )
-        }
-    }
-    
-    private func iconForCategory(_ cat: FlavorCategory) -> String {
-        switch cat {
-        case .fruity: return "leaf.fill"
-        case .floral: return "sparkles"
-        case .nutty: return "circle.grid.3x3.fill"
-        case .sweet: return "cube.fill"
-        }
     }
 }
 

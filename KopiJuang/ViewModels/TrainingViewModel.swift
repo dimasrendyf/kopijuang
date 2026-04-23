@@ -9,67 +9,40 @@ import Observation
 @MainActor
 @Observable
 final class TrainingViewModel {
-    let flavor: String
+    let category: FlavorCategory
     let stage: DiscoveryStage
+    private let block: TrainingContentBlock
 
-    init(flavor: String, stage: DiscoveryStage) {
-        self.flavor = flavor
+    init(category: FlavorCategory, stage: DiscoveryStage) {
+        self.category = category
         self.stage = stage
+        self.block = TrainingContent.block(category: category, stage: stage)
     }
 
-    var stageSubtitle: String {
-        switch stage {
-        case .fragrance:
-            "Gapapa kalau masih bingung. Yuk latih hidungmu dulu di tahap fragrance."
-        case .aroma:
-            "Wajar kalau dry dan wet kadang mirip. Yuk latih pembacaan aroma bloom."
-        case .taste:
-            "Gapapa salah tebak, ini proses belajar rasa di lidah."
-        }
-    }
+    var stageSubtitle: String { block.stageIntro }
 
-    var trainingPrompt: String {
-        switch stage {
-        case .fragrance:
-            "Siapkan referensi \(flavor) lalu cium dalam kondisi kering. Fokus di hidung, jangan buru-buru menilai rasa."
-        case .aroma:
-            "Siapkan referensi \(flavor), lalu bandingkan aromanya setelah kontak air panas. Tujuannya melatih transisi dry ke wet."
-        case .taste:
-            "Siapkan referensi \(flavor). Jika tidak ada, gunakan ingatan rasa yang mirip untuk bantu kalibrasi saat menyeruput."
-        }
-    }
+    var trainingPrompt: String { block.lead }
 
-    var stageSteps: [String] {
-        switch stage {
-        case .fragrance:
-            [
-                "Cium referensi \(flavor) dalam kondisi kering.",
-                "Sebutkan 1-2 kata kunci aromanya (misal segar, manis, kacang).",
-                "Cium bubuk kopimu lagi dan bandingkan."
-            ]
-        case .aroma:
-            [
-                "Cium referensi \(flavor), lalu cium kopi saat wet/bloom.",
-                "Catat apakah aroma jadi lebih jelas atau berubah.",
-                "Bandingkan lagi dengan fase dry untuk lihat kontras."
-            ]
-        case .taste:
-            [
-                "Cium atau icip referensi \(flavor) untuk kalibrasi cepat.",
-                "Tahan sensasi itu di memori lidahmu.",
-                "Icip kopimu lagi dengan teknik slurp."
-            ]
-        }
-    }
+    var stageSteps: [String] { block.steps }
 
-    /// Informal hint (e.g. for future asset / copy).
+    var referenceNote: String { block.reference }
+
+    /// Label bantu bila nanti aset/referensi visual (nama singkat, ID).
     func imageLabel(for flavorName: String) -> String {
-        switch flavorName.lowercased() {
-        case "fruity": "jeruk/lemon"
-        case "floral": "bunga mawar"
-        case "nutty": "kacang/cokelat"
-        case "sweet": "gula/madu"
-        default: "referensi"
+        if let c = FlavorCategory.fromStoredName(flavorName) { return c.rawValue }
+        if let c = FlavorCategory(rawValue: flavorName) { return c.rawValue }
+        let key = flavorName.lowercased()
+        switch key {
+        case "fruity": return "jeruk, berry, tropis"
+        case "floral": return "bunga, teh floral"
+        case "nutty", "nutty / cocoa", "nuttycocoa": return "kacang, kakao, cokelat"
+        case "sweet": return "madu, karamel, vanila"
+        case "sour", "sour / fermented", "sourfermented": return "asam, winey, ferment"
+        case "green", "green / vegetative", "greenvegetative": return "hijau, herb, zaitun"
+        case "other": return "kertas, bumi, asing"
+        case "roasted": return "malt, sangrai, asap ringan"
+        case "spices": return "cengkih, pala, lada"
+        default: return "referensi"
         }
     }
 }

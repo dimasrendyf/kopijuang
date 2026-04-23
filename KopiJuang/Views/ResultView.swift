@@ -118,7 +118,7 @@ struct ResultView: View {
                     Button {
                         viewModel.showDiscovery = true
                     } label: {
-                        Text("Aku gak yakin, bantu discovery notes")
+                        Text("Butuh bantuan: catatan pengecapan")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .padding(.vertical, 10)
@@ -155,7 +155,7 @@ struct ResultView: View {
         }
         .sheet(isPresented: $viewModel.showDiscovery) {
             NavigationStack {
-                DiscoveryNotesView(stage: .taste)
+                DiscoveryNotesView(stage: .taste) { viewModel.showDiscovery = false }
             }
         }
     }
@@ -268,8 +268,14 @@ struct FeedbackView: View {
                         .controlSize(.large)
                     }
                 } else {
-                    NavigationLink(destination: TrainingView(flavor: category.rawValue)) {
-                        Text("Ayo Latihan Rasa \(category.rawValue)")
+                    NavigationLink {
+                        TrainingView(
+                            category: category,
+                            stage: .taste,
+                            onCloseEntireSheet: { dismiss() }
+                        )
+                    } label: {
+                        Text("Ayo latihan rasa \(category.rawValue)")
                             .bold()
                             .frame(maxWidth: .infinity)
                     }

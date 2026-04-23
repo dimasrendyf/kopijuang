@@ -37,39 +37,47 @@ final class FinalAnalysisViewModel {
         return node.name
     }
 
-    var certaintyMessage: String {
+    /// Menggantikan "keyakinan": ringkas data yang sudah diisi (bukan opini generik).
+    var flowDataSummary: String {
+        var parts: [String] = []
+        parts.append(
+            "Kopi: \(evaluation.beanName) · \(evaluation.beanOrigin). Seduh: \(evaluation.roastLevel), \(evaluation.processLevel)."
+        )
+        parts.append(
+            "Kering: \(evaluation.fragranceCategory.rawValue) (int. \(Int(evaluation.fragranceIntensity))). Basah: \(evaluation.aromaCategory.rawValue) (int. \(Int(evaluation.aromaIntensity))), kontras: \(evaluation.aromaContrast.rawValue)."
+        )
+        parts.append(
+            "Kesan taste (slurp): asam \(Int(evaluation.acidity)), manis \(Int(evaluation.sweetness)), pahit \(Int(evaluation.bitterness)), body \(Int(evaluation.bodyScore)), dominan peta \(evaluation.tasteCategory.rawValue)."
+        )
         if evaluation.aromaContrast == .unsure {
-            return "Wajar kalau tadi kamu sempat belum yakin membedakan dry dan wet aroma. Itu bagian normal dari latihan sensory. Kamu tetap berhasil memilih profil yang paling mendekati pengalamanmu."
+            parts.append("Kamu tandai “gak yakin” pada kontras dry–wet: wajar. Di sesi berikutnya, coba satu kata kunci per fase sebelum skor penuh.")
         }
-        return "Pilihanmu konsisten dengan alur sensory yang kamu isi. Mantap, ini langkah bagus untuk membangun memori rasa."
+        if evaluation.fragranceCategory == evaluation.tasteCategory {
+            parts.append("Arah fragrance dan taste kategori L1 selaras (\(evaluation.fragranceCategory.rawValue)).")
+        } else {
+            parts.append("Fragrance \(evaluation.fragranceCategory.rawValue) vs taste dominan \(evaluation.tasteCategory.rawValue): tidak wajib sama; volatile (kering) vs slurp bisa beda tajam/landai.")
+        }
+        if primaryCategory == evaluation.tasteCategory {
+            parts.append("Pilihan L1 final (\(primaryCategory.rawValue)) selaras dengan kategori taste yang kamu isi.")
+        } else {
+            parts.append("L1 pilihan akhir: \(primaryCategory.rawValue) (eksplorasi), taste card: \(evaluation.tasteCategory.rawValue)—keduanya boleh beda: L1 = kesan total, card = dominan sesaat.")
+        }
+        return parts.joined(separator: "\n\n")
     }
 
     var spotlightMessage: String {
+        let base = "Terekam di sesi: asam \(Int(evaluation.acidity)), manis \(Int(evaluation.sweetness)), pahit \(Int(evaluation.bitterness)), body \(Int(evaluation.bodyScore))."
         if let secondaryNote, let specificNote {
-            return "Kamu memilih profil \(primaryCategory.rawValue) dengan turunan \(secondaryNote) dan note spesifik \(specificNote). Selamat, kamu sudah masuk level eksplorasi detail."
+            return "\(base) Kamu mengebor \(primaryCategory.rawValue) → \(secondaryNote) → \(specificNote). Detail wheel sudah menempel ke riwayat."
         }
         if let secondaryNote {
-            return "Kamu memilih profil \(primaryCategory.rawValue) dengan turunan \(secondaryNote). Ini sudah menunjukkan kamu mulai peka ke detail rasa."
+            return "\(base) Turunan: \(secondaryNote) di bawah payung \(primaryCategory.rawValue)."
         }
-        return "Kamu memilih profil \(primaryCategory.rawValue). Selamat ya, kamu berhasil mengenali karakter utama dari cangkir ini."
+        return "\(base) Pilihan utama: \(primaryCategory.rawValue)."
     }
 
     var brewGuidance: String {
-        let roast = evaluation.roastLevel.lowercased()
-        let process = evaluation.processLevel.lowercased()
-        if evaluation.aromaContrast == .unsure {
-            return "Untuk sesi berikutnya, coba jeda 15-20 detik antara cium dry dan wet lalu catat 1 kata kunci tiap fase. Teknik ini biasanya bantu mengurangi rasa ragu."
-        }
-        if evaluation.bitterness >= 8 && roast == "dark" {
-            return "Pahit dominan dari profil dark roast + ekstraksi. Besok coba turunkan suhu ke 88-90C."
-        }
-        if evaluation.acidity >= 8 && roast == "light" {
-            return "Keasaman cukup tajam. Besok coba grind sedikit lebih halus agar ekstraksi lebih seimbang."
-        }
-        if evaluation.sweetness <= 4 && (process == "natural" || process == "honey") {
-            return "Manis alami belum keluar maksimal. Besok coba rasio sedikit lebih pekat."
-        }
-        return "Cup kamu sudah cukup balance. Besok ubah satu variabel kecil saja (rasio/suhu/grind) agar progres belajar terasa jelas."
+        BrewHeuristics.nextBrewGuidance(for: evaluation)
     }
 
     func selectedNoteExperienceCount(from userProgresses: [UserProgress]) -> Int {
@@ -86,5 +94,4 @@ final class FinalAnalysisViewModel {
         default: "Peka"
         }
     }
-
 }

@@ -18,11 +18,11 @@ final class SensoryInputViewModel {
     var scrollToTopNonce: Int = 0
 
     var fragranceIntensity: Double = 6
-    var fragranceCategory: FlavorCategory = .nutty
+    var fragranceCategory: FlavorCategory = .fruity
 
     var aromaContrast: AromaContrast = .unsure
     var aromaIntensity: Double = 6
-    var aromaCategory: FlavorCategory = .nutty
+    var aromaCategory: FlavorCategory = .fruity
 
     var acidity: Double = 6
     var sweetness: Double = 6
@@ -40,10 +40,6 @@ final class SensoryInputViewModel {
         self.beanOrigin = beanOrigin
         self.roastLevel = roastLevel
         self.processLevel = processLevel
-    }
-
-    func onFragranceStepAppear() {
-        if aromaCategory == .nutty { aromaCategory = fragranceCategory }
     }
 
     func onAromaStepAppear() {

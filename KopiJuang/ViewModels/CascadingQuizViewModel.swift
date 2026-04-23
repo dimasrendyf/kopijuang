@@ -87,11 +87,18 @@ final class CascadingQuizViewModel {
     ) {
         guard completed else { return }
         let progress = UserProgressStore.primary(from: userProgresses, in: modelContext)
+        let snapshot = SessionSnapshot(
+            evaluation: evaluation,
+            primaryCategory: selectedPrimaryCategory,
+            selectedNode: selectedNode
+        )
+        let data = try? JSONEncoder().encode(snapshot)
         let history = SessionHistory(
             beanName: evaluation.beanName,
             roastLevel: evaluation.roastLevel,
             processLevel: evaluation.processLevel,
-            finalCategory: selectedPrimaryCategory.rawValue
+            finalCategory: selectedPrimaryCategory.rawValue,
+            snapshotData: data
         )
         modelContext.insert(history)
         progress.completedSessions.append(history)

@@ -21,8 +21,6 @@ final class CoffeeSetupViewModel {
         !beanName.isEmpty && !roastLevel.isEmpty && !processLevel.isEmpty
     }
 
-    var showBeanInsight: Bool { !roastLevel.isEmpty && !processLevel.isEmpty }
-
     func roastDescription(for level: String) -> String {
         switch level {
         case "Light": "Acidity lebih terbaca, body ringan, notes origin lebih jelas."
@@ -41,23 +39,6 @@ final class CoffeeSetupViewModel {
         case "Anaerobic": "Notes eksotik, seringkali ada karakter fermentasi/winey."
         case "Wet Hulled": "Body sangat tebal, acidity rendah, notes earthy/spicy khas Indonesia."
         default: ""
-        }
-    }
-
-    func focusHint(roast: String, process: String) -> String {
-        switch (roast.lowercased(), process.lowercased()) {
-        case ("light", "natural"):
-            "cek acidity cerah + sweetness fruity."
-        case ("light", "wash"), ("light", "washed"):
-            "cek kejernihan acidity dan clean finish."
-        case ("dark", _):
-            "cek body, bitterness, dan ketebalan aftertaste."
-        case (_, "honey"):
-            "cek sweetness round dan mouthfeel nyaman."
-        case (_, "wet hulled"):
-            "cek body tebal dan earthy note."
-        default:
-            "cek keseimbangan acidity, sweetness, bitterness, dan body."
         }
     }
 }

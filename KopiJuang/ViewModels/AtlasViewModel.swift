@@ -13,7 +13,11 @@ final class AtlasViewModel {
 
     /// Builds flat `FlavorNote` list from progress + static wheel.
     func flavorNotes(from userProgresses: [UserProgress]) -> [FlavorNote] {
-        let unlockedPrimary = Set(userProgresses.flatMap(\.unlockedPrimaryNotes))
+        let unlockedPrimary = Set(
+            userProgresses
+                .flatMap(\.unlockedPrimaryNotes)
+                .map { $0.asNormalizedPrimaryFlavor }
+        )
         let unlockedSecondary = Set(userProgresses.flatMap(\.unlockedSecondaryNotes))
         let unlockedSpecific = Set(userProgresses.flatMap(\.unlockedSpecificNotes))
         let experienced = userProgresses.flatMap(\.allExperiencedNotes)

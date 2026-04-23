@@ -54,14 +54,25 @@ class SessionHistory {
     var roastLevel: String
     var processLevel: String
     var finalCategory: String
-    
-    init(id: UUID = UUID(), date: Date = Date(), beanName: String, roastLevel: String, processLevel: String, finalCategory: String) {
+    /// JSON `SessionSnapshot` (isi sesi); nil = sesi lama sebelum fitur snapshot.
+    var snapshotData: Data?
+
+    init(
+        id: UUID = UUID(),
+        date: Date = Date(),
+        beanName: String,
+        roastLevel: String,
+        processLevel: String,
+        finalCategory: String,
+        snapshotData: Data? = nil
+    ) {
         self.id = id
         self.date = date
         self.beanName = beanName
         self.roastLevel = roastLevel
         self.processLevel = processLevel
         self.finalCategory = finalCategory
+        self.snapshotData = snapshotData
     }
 }
 

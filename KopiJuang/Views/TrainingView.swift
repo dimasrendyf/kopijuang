@@ -8,11 +8,19 @@
 import SwiftUI
 
 struct TrainingView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: TrainingViewModel
+    var onCloseEntireSheet: () -> Void
 
-    init(flavor: String, stage: DiscoveryStage = .taste) {
-        _viewModel = State(wrappedValue: TrainingViewModel(flavor: flavor, stage: stage))
+    init(
+        category: FlavorCategory,
+        stage: DiscoveryStage = .taste,
+        onCloseEntireSheet: @escaping () -> Void
+    ) {
+        _viewModel = State(
+            wrappedValue: TrainingViewModel(category: category, stage: stage)
+        )
+        self.onCloseEntireSheet = onCloseEntireSheet
     }
 
     var body: some View {
@@ -25,19 +33,20 @@ struct TrainingView: View {
                         .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
 
                     VStack(spacing: 4) {
-                        Text("Ayo kenali \(viewModel.flavor)!")
+                        Text("Kenali \(viewModel.category.rawValue)")
                             .font(.title2.bold())
                             .multilineTextAlignment(.center)
 
                         Text(viewModel.stageSubtitle)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
                 }
                 .padding(.top)
 
                 VStack(alignment: .leading, spacing: 16) {
-                    Label("Siapkan \(viewModel.flavor)", systemImage: "sparkles")
+                    Label("Latihan singkat", systemImage: "sparkles")
                         .font(.headline)
                         .foregroundStyle(.brown)
 
@@ -51,22 +60,30 @@ struct TrainingView: View {
                 .padding(.horizontal)
 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Langkah Latihan:")
+                    Text("Langkah:")
                         .font(.headline)
 
                     TrainingStepRow(number: 1, text: viewModel.stageSteps[0])
-                    TrainingStepRow(number: 2, text: viewModel.stageSteps[1])
-                    TrainingStepRow(number: 3, text: viewModel.stageSteps[2])
+                    if viewModel.stageSteps.count > 1 {
+                        TrainingStepRow(number: 2, text: viewModel.stageSteps[1])
+                    }
                 }
                 .padding(.horizontal)
 
-                Spacer()
+                Text(viewModel.referenceNote)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Spacer(minLength: 0)
 
                 VStack(spacing: 12) {
                     Button {
                         dismiss()
                     } label: {
-                        Text("Coba tebak lagi")
+                        Text("Eksplor kategori lain")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -76,9 +93,9 @@ struct TrainingView: View {
                     }
 
                     Button {
-                        NavigationService.popToRootView()
+                        onCloseEntireSheet()
                     } label: {
-                        Text("Selesai & Kembali ke Dashboard")
+                        Text("Aku sudah paham, kembali pilih")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -94,6 +111,8 @@ struct TrainingView: View {
                 .padding(.bottom, 30)
             }
         }
+        .navigationTitle("Latihan")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -120,5 +139,7 @@ struct TrainingStepRow: View {
 }
 
 #Preview {
-    TrainingView(flavor: "Citrus", stage: .taste)
+    NavigationStack {
+        TrainingView(category: .fruity, stage: .taste, onCloseEntireSheet: {})
+    }
 }

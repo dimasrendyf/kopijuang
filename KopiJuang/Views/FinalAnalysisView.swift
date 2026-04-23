@@ -40,16 +40,17 @@ struct FinalAnalysisView: View {
                 }
                 .padding(.top, 8)
 
-                FinalCard(title: "Highlight Profil") {
+                FinalCard(title: "Highlight profil") {
                     Text(viewModel.spotlightMessage)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
-                FinalCard(title: "Status Keyakinan") {
-                    Text(viewModel.certaintyMessage)
+                FinalCard(title: "Data yang terekam") {
+                    Text(viewModel.flowDataSummary)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
                 }
 
                 FinalCard(title: "Profil Akhir") {
