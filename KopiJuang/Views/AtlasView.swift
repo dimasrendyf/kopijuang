@@ -17,7 +17,7 @@ struct AtlasView: View {
         let unlockedPrimary = Set(userProgresses.flatMap(\.unlockedPrimaryNotes))
         let unlockedSecondary = Set(userProgresses.flatMap(\.unlockedSecondaryNotes))
         let unlockedSpecific = Set(userProgresses.flatMap(\.unlockedSpecificNotes))
-        let experienced = userProgresses.flatMap(\.experiencedNotes)
+        let experienced = userProgresses.flatMap(\.allExperiencedNotes)
         var list: [FlavorNote] = []
         
         func traverse(_ node: FlavorWheelNode) {

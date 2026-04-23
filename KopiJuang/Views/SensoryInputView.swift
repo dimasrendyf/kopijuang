@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SensoryInputView: View {
     @Environment(\.dismiss) var dismiss
@@ -100,7 +101,8 @@ struct SensoryInputView: View {
                     footer
                 }
             }
-            .onChange(of: scrollToTopNonce) { _ in
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: scrollToTopNonce) { _, _ in
                 withAnimation(.easeInOut(duration: 0.25)) {
                     proxy.scrollTo("top", anchor: .top)
                 }
@@ -454,7 +456,7 @@ private struct AromaStepView: View {
             }
             .padding(.horizontal)
         }
-        .onChange(of: contrast) { newValue in
+        .onChange(of: contrast) { _, newValue in
             if newValue == .same { wetCategory = dryCategory }
         }
         .sheet(isPresented: $showDiscovery) {
@@ -717,9 +719,17 @@ private struct MetricSlider: View {
                     .font(.subheadline.weight(.semibold))
             }
             
-            Slider(value: $value, in: range, step: step)
+            Slider(
+                value: $value,
+                in: range,
+                step: step,
+                onEditingChanged: { isEditing in
+                    if !isEditing {
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    }
+                }
+            )
             .tint(.brown)
-            .softHapticOnChange(Int(value))
             
             HStack {
                 Text(lowText).font(.caption2)
@@ -783,7 +793,6 @@ private struct MetricScale: View {
                 step: step
             )
             .frame(height: 44)
-            .softHapticOnChange(Int(value))
             
             HStack {
                 Text(lowText).font(.caption2)
@@ -799,7 +808,19 @@ private struct SmoothDiscreteSlider: View {
     @Binding var value: Double
     let range: ClosedRange<Double>
     let step: Double
-    
+
+    @State private var localValue: Double
+    @State private var isDragging = false
+
+    init(value: Binding<Double>, range: ClosedRange<Double>, step: Double) {
+        _value = value
+        self.range = range
+        self.step = step
+        _localValue = State(initialValue: value.wrappedValue)
+    }
+
+    private var display: Double { isDragging ? localValue : value }
+
     var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
@@ -809,18 +830,18 @@ private struct SmoothDiscreteSlider: View {
             let trackXStart = thumbSize / 2
             let trackXEnd = width - thumbSize / 2
             let trackWidth = max(1, trackXEnd - trackXStart)
-            
+
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: trackHeight / 2)
                     .fill(Color(.systemGray5))
                     .frame(height: trackHeight)
                     .position(x: width / 2, y: height / 2)
-                
+
                 RoundedRectangle(cornerRadius: trackHeight / 2)
                     .fill(Color.brown)
                     .frame(width: filledWidth(trackWidth: trackWidth), height: trackHeight)
                     .position(x: trackXStart + filledWidth(trackWidth: trackWidth) / 2, y: height / 2)
-                
+
                 Circle()
                     .fill(Color(.systemBackground))
                     .overlay(
@@ -834,15 +855,24 @@ private struct SmoothDiscreteSlider: View {
             .highPriorityGesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { gesture in
+                        isDragging = true
                         let x = clamp(gesture.location.x, min: trackXStart, max: trackXEnd)
                         let ratio = (x - trackXStart) / trackWidth
                         let raw = range.lowerBound + ratio * (range.upperBound - range.lowerBound)
-                        value = snapped(raw)
+                        localValue = snapped(raw)
+                    }
+                    .onEnded { _ in
+                        value = localValue
+                        isDragging = false
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
             )
         }
+        .onChange(of: value) { _, newValue in
+            if !isDragging { localValue = newValue }
+        }
     }
-    
+
     private func snapped(_ raw: Double) -> Double {
         guard step > 0 else { return clamp(raw, min: range.lowerBound, max: range.upperBound) }
         let normalized = (raw - range.lowerBound) / step
@@ -850,16 +880,16 @@ private struct SmoothDiscreteSlider: View {
         let snapped = range.lowerBound + rounded * step
         return clamp(snapped, min: range.lowerBound, max: range.upperBound)
     }
-    
+
     private func filledWidth(trackWidth: CGFloat) -> CGFloat {
-        let ratio = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
+        let ratio = (display - range.lowerBound) / (range.upperBound - range.lowerBound)
         return clamp(CGFloat(ratio) * trackWidth, min: 0, max: trackWidth)
     }
-    
+
     private func thumbX(trackWidth: CGFloat, trackXStart: CGFloat) -> CGFloat {
         trackXStart + filledWidth(trackWidth: trackWidth)
     }
-    
+
     private func clamp<T: Comparable>(_ x: T, min: T, max: T) -> T {
         Swift.min(Swift.max(x, min), max)
     }
@@ -921,17 +951,6 @@ private struct InputCard<Content: View>: View {
         )
         .shadow(color: .black.opacity(0.03), radius: 6, x: 0, y: 2)
         .cornerRadius(20)
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func softHapticOnChange(_ trigger: Int) -> some View {
-        if #available(iOS 17.0, *) {
-            sensoryFeedback(.selection, trigger: trigger)
-        } else {
-            self
-        }
     }
 }
 

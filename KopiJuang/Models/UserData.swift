@@ -11,7 +11,7 @@ class UserProgress {
     var unlockedPrimaryNotes: [String]
     var unlockedSecondaryNotes: [String]
     var unlockedSpecificNotes: [String]
-    var experiencedNotes: [String]
+    var experiencedNotes: [String]?
     var totalCorrectGuesses: Int
     
     @Relationship(deleteRule: .cascade) var completedSessions: [SessionHistory]
@@ -21,7 +21,7 @@ class UserProgress {
         unlockedPrimaryNotes: [String] = [],
         unlockedSecondaryNotes: [String] = [],
         unlockedSpecificNotes: [String] = [],
-        experiencedNotes: [String] = [],
+        experiencedNotes: [String]? = [],
         totalCorrectGuesses: Int = 0,
         completedSessions: [SessionHistory] = [],
         badges: [UserBadge] = []
@@ -33,6 +33,16 @@ class UserProgress {
         self.totalCorrectGuesses = totalCorrectGuesses
         self.completedSessions = completedSessions
         self.badges = badges
+    }
+}
+
+extension UserProgress {
+    var allExperiencedNotes: [String] { experiencedNotes ?? [] }
+    
+    func appendExperiencedNote(_ name: String) {
+        var next = experiencedNotes ?? []
+        next.append(name)
+        experiencedNotes = next
     }
 }
 

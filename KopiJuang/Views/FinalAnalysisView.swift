@@ -64,7 +64,7 @@ struct FinalAnalysisView: View {
     
     private var selectedNoteExperienceCount: Int {
         guard let selectedNode else { return 0 }
-        let experienced = userProgresses.flatMap(\.experiencedNotes)
+        let experienced = userProgresses.flatMap(\.allExperiencedNotes)
         return experienced.filter { $0 == selectedNode.name }.count
     }
     

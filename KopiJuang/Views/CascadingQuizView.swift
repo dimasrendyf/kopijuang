@@ -153,7 +153,7 @@ struct CascadingQuizView: View {
                 progress.unlockedSpecificNotes.append(child.name)
             }
         }
-        progress.experiencedNotes.append(child.name)
+        progress.appendExperiencedNote(child.name)
         
         do {
             try modelContext.save()

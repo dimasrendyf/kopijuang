@@ -27,7 +27,7 @@ struct MainTabView: View {
                 .tag(1)
         }
         .accentColor(.brown)
-        .onChange(of: dashboardResetCounter) { _ in
+        .onChange(of: dashboardResetCounter) { _, _ in
             selectedTab = 0
         }
     }

@@ -41,6 +41,7 @@ struct CoffeeSetupView: View {
                     Text("Pilih Level...").tag("")
                     ForEach(roastOptions, id: \.self) { Text($0).tag($0) }
                 }
+                .pickerStyle(.menu)
                 
                 if !roastLevel.isEmpty {
                     Text(roastDescription(for: roastLevel))
@@ -52,6 +53,7 @@ struct CoffeeSetupView: View {
                     Text("Pilih Proses...").tag("")
                     ForEach(processOptions, id: \.self) { Text($0).tag($0) }
                 }
+                .pickerStyle(.menu)
                 
                 if !processLevel.isEmpty {
                     Text(processDescription(for: processLevel))
@@ -89,6 +91,7 @@ struct CoffeeSetupView: View {
                 }
             }
         }
+        .scrollDismissesKeyboard(.interactively)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink(destination: SensoryInputView(beanName: beanName, beanOrigin: beanOrigin, roastLevel: roastLevel, processLevel: processLevel)) {
@@ -142,12 +145,14 @@ struct LabeledTextField: View {
     let icon: String
     let placeholder: String
     @Binding var text: String
-    
+
     var body: some View {
-        HStack {
+        HStack(alignment: .firstTextBaseline) {
             Image(systemName: icon)
                 .foregroundStyle(.brown)
             TextField(placeholder, text: $text)
+                .textFieldStyle(.plain)
+                .textInputAutocapitalization(.words)
         }
     }
 }

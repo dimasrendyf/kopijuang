@@ -218,7 +218,7 @@ struct ResultView: View {
         if !progress.unlockedPrimaryNotes.contains(category.rawValue) {
             progress.unlockedPrimaryNotes.append(category.rawValue)
         }
-        progress.experiencedNotes.append(category.rawValue)
+        progress.appendExperiencedNote(category.rawValue)
         do {
             try modelContext.save()
         } catch {
