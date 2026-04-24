@@ -18,17 +18,17 @@ final class SensoryInputViewModel {
     var scrollToTopNonce: Int = 0
 
     var fragranceIntensity: Double = 6
-    var fragranceCategory: FlavorCategory = .fruity
+    var fragranceCategory: FlavorCategory?
 
     var aromaContrast: AromaContrast = .unsure
     var aromaIntensity: Double = 6
-    var aromaCategory: FlavorCategory = .fruity
+    var aromaCategory: FlavorCategory?
 
     var acidity: Double = 6
     var sweetness: Double = 6
     var bitterness: Double = 6
     var bodyScore: Double = 6
-    var tasteCategory: FlavorCategory = .fruity
+    var tasteCategory: FlavorCategory?
 
     init(
         beanName: String,
@@ -43,10 +43,26 @@ final class SensoryInputViewModel {
     }
 
     func onAromaStepAppear() {
-        if aromaContrast == .same { aromaCategory = fragranceCategory }
+        if aromaContrast == .same, let f = fragranceCategory {
+            aromaCategory = f
+        }
+    }
+
+    /// Bisa "Lanjut" / navigasi hasil: kategori wajib dipilih per aturan step.
+    var canAdvanceFromCurrentStep: Bool {
+        switch step {
+        case .fragrance:
+            return fragranceCategory != nil
+        case .aroma:
+            if aromaContrast == .same { return fragranceCategory != nil }
+            return aromaCategory != nil
+        case .taste:
+            return tasteCategory != nil
+        }
     }
 
     func goNext() {
+        guard canAdvanceFromCurrentStep else { return }
         switch step {
         case .fragrance:
             step = .aroma
@@ -74,21 +90,33 @@ final class SensoryInputViewModel {
     }
 
     func makeEvaluation() -> SensoryEvaluation {
-        SensoryEvaluation(
+        guard let f = fragranceCategory, let t = tasteCategory else {
+            preconditionFailure("makeEvaluation: kategori wajib sudah terisi (cek canAdvanceFromCurrentStep).")
+        }
+        let a: FlavorCategory
+        if aromaContrast == .same {
+            a = f
+        } else {
+            guard let w = aromaCategory else {
+                preconditionFailure("makeEvaluation: aroma basah wajib jika kontras bukan Sama.")
+            }
+            a = w
+        }
+        return SensoryEvaluation(
             beanName: beanName,
             beanOrigin: beanOrigin,
             roastLevel: roastLevel,
             processLevel: processLevel,
             fragranceIntensity: fragranceIntensity,
-            fragranceCategory: fragranceCategory,
+            fragranceCategory: f,
             aromaContrast: aromaContrast,
             aromaIntensity: aromaIntensity,
-            aromaCategory: aromaContrast == .same ? fragranceCategory : aromaCategory,
+            aromaCategory: a,
             acidity: acidity,
             sweetness: sweetness,
             bitterness: bitterness,
             bodyScore: bodyScore,
-            tasteCategory: tasteCategory
+            tasteCategory: t
         )
     }
 }

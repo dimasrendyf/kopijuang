@@ -111,22 +111,28 @@ struct SensoryInputView: View {
     }
 
     private var footer: some View {
-        VStack(spacing: 12) {
+        let canGo = viewModel.canAdvanceFromCurrentStep
+        return VStack(spacing: 12) {
             if viewModel.step == .taste {
-                NavigationLink(
-                    destination: ResultView(
-                        evaluation: viewModel.makeEvaluation()
-                    )
-                ) {
-                    Text("Lanjut")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.brown)
-                        .cornerRadius(12)
+                // `makeEvaluation()` hanya boleh dipanggil bila pilihan lengkap; jangan sertakan
+                // di `NavigationLink` bila canGo = false, karena body SwiftUI mengevaluasi destination.
+                if canGo {
+                    NavigationLink(
+                        destination: ResultView(
+                            evaluation: viewModel.makeEvaluation()
+                        )
+                    ) {
+                        tasteFooterLabel(active: true)
+                    }
+                    .padding(.horizontal)
+                } else {
+                    Button(action: {}) {
+                        tasteFooterLabel(active: false)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(true)
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             } else {
                 Button {
                     viewModel.goNext()
@@ -136,12 +142,23 @@ struct SensoryInputView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.brown)
+                        .background(canGo ? Color.brown : Color.brown.opacity(0.35))
                         .cornerRadius(12)
                 }
+                .disabled(!canGo)
                 .padding(.horizontal)
             }
         }
+    }
+
+    private func tasteFooterLabel(active: Bool) -> some View {
+        Text("Lanjut")
+            .font(.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(active ? Color.brown : Color.brown.opacity(0.35))
+            .cornerRadius(12)
     }
 }
 
@@ -156,24 +173,25 @@ private struct SessionMetaRow: View {
     let processLevel: String
     
     var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                Label(beanName, systemImage: "cup.and.saucer.fill")
-                Text("•")
-                    .foregroundStyle(.secondary)
-                Label(beanOrigin, systemImage: "map.fill")
-                Spacer(minLength: 0)
-            }
-            HStack(spacing: 8) {
-                Label(roastLevel, systemImage: "flame.fill")
-                Text("•")
-                    .foregroundStyle(.secondary)
-                Label(processLevel, systemImage: "drop.fill")
-                Spacer(minLength: 0)
-            }
+        HStack(spacing: 8) {
+            Label(beanName, systemImage: "cup.and.saucer.fill")
+            
+            Text("•").foregroundStyle(.secondary)
+            
+            Label(beanOrigin, systemImage: "map.fill")
+            
+            Text("•").foregroundStyle(.secondary)
+            
+            Label(roastLevel, systemImage: "flame.fill")
+            
+            Text("•").foregroundStyle(.secondary)
+            
+            Label(processLevel, systemImage: "drop.fill")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
+        .lineLimit(1) // Memastikan teks tetap dalam satu baris
+        .minimumScaleFactor(0.8) // Mengecilkan teks otomatis jika ruang tidak cukup
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -199,7 +217,7 @@ private struct StepIndicator: View {
 // MARK: - Step 1: Fragrance (Dry Coffee)
 private struct FragranceStepView: View {
     @Binding var intensity: Double
-    @Binding var category: FlavorCategory
+    @Binding var category: FlavorCategory?
     
     @State private var isSniffing = true
     @State private var ringScale: CGFloat = 0.2
@@ -300,10 +318,10 @@ private struct PulseRing: View {
 
 // MARK: - Step 2: Aroma (Wet Coffee / Bloom)
 private struct AromaStepView: View {
-    let dryCategory: FlavorCategory
+    let dryCategory: FlavorCategory?
     
     @Binding var contrast: AromaContrast
-    @Binding var wetCategory: FlavorCategory
+    @Binding var wetCategory: FlavorCategory?
     @Binding var wetIntensity: Double
     @State private var showDiscovery = false
     
@@ -360,24 +378,34 @@ private struct AromaStepView: View {
                 } else {
                     InputCard(
                         title: "Aksi 3",
-                        prompt: "Karena kamu pilih “Sama”, kategori wet otomatis mengikuti kategori saat dry."
+                        prompt: "Karena kamu pilih “Sama”, kategori wet mengikuti kategori saat kering."
                     ) {
                         HStack {
                             Text("Kategori wet")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Text(dryCategory.rawValue)
-                                .font(.headline)
-                                .foregroundStyle(.brown)
+                            if let dry = dryCategory {
+                                Text(dry.rawValue)
+                                    .font(.headline)
+                                    .foregroundStyle(.brown)
+                            } else {
+                                Text("—")
+                                    .font(.headline)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
                     }
                 }
             }
             .padding(.horizontal)
         }
-        .onChange(of: contrast) { _, newValue in
-            if newValue == .same { wetCategory = dryCategory }
+        .onChange(of: contrast) { old, new in
+            if new == .same, let d = dryCategory {
+                wetCategory = d
+            } else if old == .same, new != .same {
+                wetCategory = nil
+            }
         }
         .sheet(isPresented: $showDiscovery) {
             NavigationStack {
@@ -457,7 +485,7 @@ private struct TasteStepView: View {
     @Binding var sweetness: Double
     @Binding var bitterness: Double
     @Binding var bodyScore: Double
-    @Binding var category: FlavorCategory
+    @Binding var category: FlavorCategory?
     @State private var showDiscovery = false
     
     var body: some View {
@@ -913,7 +941,7 @@ private struct InputCard<Content: View>: View {
 
 private struct CategoryPickerGrid: View {
     let stage: DiscoveryStage
-    @Binding var selection: FlavorCategory
+    @Binding var selection: FlavorCategory?
     var onUnsureTap: (() -> Void)? = nil
     
     var body: some View {
@@ -932,7 +960,7 @@ private struct CategoryPickerGrid: View {
     
     private func categoryRow(_ category: FlavorCategory) -> some View {
         let descriptor = CategoryPickerDescriptors.descriptor(for: category, stage: stage)
-        let isSelected = selection == category
+        let isSelected = selection.map { $0 == category } ?? false
 
         return Button {
             selection = category
@@ -954,7 +982,6 @@ private struct CategoryPickerGrid: View {
                         Text(descriptor.summary)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                            .lineLimit(2)
                     }
                     
                     Spacer()

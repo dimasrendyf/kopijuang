@@ -6,7 +6,7 @@
 import Foundation
 
 /// Snapshot ringkas yang dipersist untuk riwayat; nilai rasa 1...10.
-struct SessionSnapshot: Codable, Equatable, Sendable {
+struct SessionSnapshot: Equatable, Sendable {
     var beanName: String
     var beanOrigin: String
     var roastLevel: String
@@ -27,6 +27,57 @@ struct SessionSnapshot: Codable, Equatable, Sendable {
     var primaryCategory: String
     var secondaryNote: String?
     var specificNote: String?
+}
+
+extension SessionSnapshot: Codable {
+    nonisolated init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        beanName = try c.decode(String.self, forKey: .beanName)
+        beanOrigin = try c.decode(String.self, forKey: .beanOrigin)
+        roastLevel = try c.decode(String.self, forKey: .roastLevel)
+        processLevel = try c.decode(String.self, forKey: .processLevel)
+        fragranceIntensity = try c.decode(Double.self, forKey: .fragranceIntensity)
+        fragranceCategory = try c.decode(String.self, forKey: .fragranceCategory)
+        aromaContrast = try c.decode(String.self, forKey: .aromaContrast)
+        aromaIntensity = try c.decode(Double.self, forKey: .aromaIntensity)
+        aromaCategory = try c.decode(String.self, forKey: .aromaCategory)
+        acidity = try c.decode(Double.self, forKey: .acidity)
+        sweetness = try c.decode(Double.self, forKey: .sweetness)
+        bitterness = try c.decode(Double.self, forKey: .bitterness)
+        bodyScore = try c.decode(Double.self, forKey: .bodyScore)
+        tasteCategory = try c.decode(String.self, forKey: .tasteCategory)
+        primaryCategory = try c.decode(String.self, forKey: .primaryCategory)
+        secondaryNote = try c.decodeIfPresent(String.self, forKey: .secondaryNote)
+        specificNote = try c.decodeIfPresent(String.self, forKey: .specificNote)
+    }
+
+    nonisolated func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(beanName, forKey: .beanName)
+        try c.encode(beanOrigin, forKey: .beanOrigin)
+        try c.encode(roastLevel, forKey: .roastLevel)
+        try c.encode(processLevel, forKey: .processLevel)
+        try c.encode(fragranceIntensity, forKey: .fragranceIntensity)
+        try c.encode(fragranceCategory, forKey: .fragranceCategory)
+        try c.encode(aromaContrast, forKey: .aromaContrast)
+        try c.encode(aromaIntensity, forKey: .aromaIntensity)
+        try c.encode(aromaCategory, forKey: .aromaCategory)
+        try c.encode(acidity, forKey: .acidity)
+        try c.encode(sweetness, forKey: .sweetness)
+        try c.encode(bitterness, forKey: .bitterness)
+        try c.encode(bodyScore, forKey: .bodyScore)
+        try c.encode(tasteCategory, forKey: .tasteCategory)
+        try c.encode(primaryCategory, forKey: .primaryCategory)
+        try c.encodeIfPresent(secondaryNote, forKey: .secondaryNote)
+        try c.encodeIfPresent(specificNote, forKey: .specificNote)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case beanName, beanOrigin, roastLevel, processLevel
+        case fragranceIntensity, fragranceCategory, aromaContrast, aromaIntensity, aromaCategory
+        case acidity, sweetness, bitterness, bodyScore, tasteCategory
+        case primaryCategory, secondaryNote, specificNote
+    }
 }
 
 extension SessionSnapshot {
