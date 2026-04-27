@@ -18,6 +18,12 @@ final class CascadingQuizViewModel {
     var selectedNode: FlavorWheelNode?
     var navigateToNext = false
     var navigateToFinalAnalysis = false
+    var showGuidanceSheet = false
+
+    var currentGuidance: FlavorNodeGuidance? {
+        guard let parent = parentNode else { return nil }
+        return FlavorGuidanceData.guidance(for: parent.id)
+    }
 
     init(
         evaluation: SensoryEvaluation,
