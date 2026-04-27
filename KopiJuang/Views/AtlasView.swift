@@ -39,13 +39,13 @@ struct AtlasView: View {
 
 struct FlavorCard: View {
     let flavor: FlavorNote
-    
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: flavor.isUnlocked ? flavor.icon : "lock.fill")
                 .font(.system(size: 40))
                 .foregroundColor(flavor.isUnlocked ? .brown : .gray)
-            
+
             Text(flavor.isUnlocked ? flavor.name : "???")
                 .font(.headline)
                 .foregroundColor(flavor.isUnlocked ? .brown : .gray)
@@ -63,5 +63,18 @@ struct FlavorCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(flavor.isUnlocked ? Color.brown.opacity(0.3) : Color.clear, lineWidth: 2)
         )
+        .overlay(alignment: .topTrailing) {
+            if flavor.isUnlocked {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(.brown)
+                    .background(
+                        Circle()
+                            .fill(Color(.secondarySystemBackground))
+                            .padding(-3)
+                    )
+                    .padding(10)
+            }
+        }
     }
 }

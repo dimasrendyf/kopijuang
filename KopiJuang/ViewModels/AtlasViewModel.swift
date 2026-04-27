@@ -61,7 +61,12 @@ final class AtlasViewModel {
 
     func filteredFlavors(from userProgresses: [UserProgress]) -> [FlavorNote] {
         let flavors = flavorNotes(from: userProgresses)
-        if searchText.isEmpty { return flavors }
-        return flavors.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        let filtered = searchText.isEmpty
+            ? flavors
+            : flavors.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        return filtered.sorted {
+            if $0.isUnlocked != $1.isUnlocked { return $0.isUnlocked }
+            return $0.experienceCount > $1.experienceCount
+        }
     }
 }

@@ -198,8 +198,13 @@ struct FlavorGuidanceSheet: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Tutup") { dismiss() }
-                        .foregroundStyle(.brown)
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.fill")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
