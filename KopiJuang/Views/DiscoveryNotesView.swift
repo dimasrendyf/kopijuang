@@ -20,7 +20,7 @@ struct DiscoveryNotesView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Bantuan pengecapan")
+                    Text("Panduan evaluasi rasa")
                         .font(.title2.bold())
                     Text(footerCopy)
                         .font(.subheadline)
@@ -43,27 +43,28 @@ struct DiscoveryNotesView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(category.rawValue)
                                 .font(.subheadline.weight(.semibold))
-                            Text("\(stage.learningLine) \(category.rawValue.lowercased())")
+                            Text(stage.learningLine(for: category))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 }
             } header: {
-                Text("Kelompok aroma & rasa")
-            } footer: {
-                Text("Daftar ini selaras peta kategori di latihan; bukan salinan peta resmi pihak ketiga.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text("9 Kelompok Flavor · SCA Wheel")
             }
+//            footer: {
+//                Text("Daftar ini selaras peta kategori di latihan; bukan salinan peta resmi pihak ketiga.")
+//                    .font(.caption)
+//                    .foregroundStyle(.secondary)
+//            }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Catatan pengecapan")
+        .navigationTitle("Panduan Rasa")
         .navigationBarTitleDisplayMode(.large)
     }
 
     private var footerCopy: String {
-        "Pilih kelompok yang mau dilatih. Ringkasan mengikuti fase \(stage.title)—bandingkan dengan cangkirmu, lalu kembali ke form."
+        "Pilih kelompok rasa untuk fase \(stage.title). Baca panduan, bandingkan langsung dengan cangkir di depanmu, lalu kembali ke form evaluasi."
     }
 }
 

@@ -10,29 +10,30 @@ import SwiftUI
 struct CoffeeSetupView: View {
     @State private var viewModel = CoffeeSetupViewModel()
     @AppStorage("shouldExpandCuppingChecklistOnFirstOpen") private var shouldExpandChecklist = true
-    @State private var checklistExpanded = false
-
+    @State private var checklistExpanded = true
+    
     var body: some View {
         @Bindable var viewModel = viewModel
         List {
             Section {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Siapkan Cangkirmu")
                         .font(.title.bold())
-
+                    
                     Text("Ceritakan sedikit tentang kopi ini. Kami memandu indramu menemukan rasa di cangkir.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.vertical, 6)
             }
             .listRowBackground(Color.clear)
-
-            Section("Detail beans") {
+            
+            CuppingChecklistSection(isExpanded: $checklistExpanded)
+            
+            Section {
                 LabeledTextField(icon: "leaf.fill", placeholder: "Nama kopi (contoh: Gayo)", text: $viewModel.beanName)
                 LabeledTextField(icon: "map.fill", placeholder: "Origin (contoh: Ethiopia)", text: $viewModel.beanOrigin)
-
+                
                 Picker("Roast", selection: $viewModel.roastLevel) {
                     Text("Pilih level…").tag("")
                     ForEach(viewModel.roastOptions, id: \.self) { Text($0).tag($0) }
@@ -43,7 +44,7 @@ struct CoffeeSetupView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-
+                
                 Picker("Proses", selection: $viewModel.processLevel) {
                     Text("Pilih proses…").tag("")
                     ForEach(viewModel.processOptions, id: \.self) { Text($0).tag($0) }
@@ -54,9 +55,12 @@ struct CoffeeSetupView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            } header: {
+                Text("Detail beans")
+                    .font(.headline)
+                    .foregroundStyle(.black)
             }
-            
-            CuppingChecklistSection(isExpanded: $checklistExpanded)
+            .padding(.top, 24)
         }
         .scrollDismissesKeyboard(.interactively)
         .onAppear {

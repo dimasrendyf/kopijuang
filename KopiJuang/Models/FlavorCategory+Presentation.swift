@@ -36,15 +36,24 @@ extension FlavorCategory {
 
     var categoryBlurb: String {
         switch self {
-        case .sweet: "Manis alami seperti gula tebu, karamel, madu, hingga vanila."
-        case .floral: "Karakter bunga, teh, dan nuansa floral yang halus."
-        case .fruity: "Segar dan cerah dengan aksen buah sitrun maupun tropis."
-        case .sourFermented: "Kompleksitas asam, fermentasi, winey, hingga nuansa alkoholik."
-        case .greenVegetative: "Karakter hijau, herbal, zaitun, dan kacang mentah."
-        case .other: "Catatan anomali: kertas, tanah, atau kesan kimiawi (objektif)."
-        case .roasted: "Profil sangrai, sereal, asap, hingga tembakau."
-        case .spices: "Rempah kering seperti cengkih, pala, kayu manis, dan lada."
-        case .nuttyCocoa: "Gurih kacang-kacangan, biji-bijian, serta intensitas kakao atau cokelat."
+        case .sweet:
+            "Manis bersih & ronde — gula tebu, karamel, brown sugar, madu, molasses, toffee, vanila. Evaluasi intensitas & panjang finish."
+        case .floral:
+            "Nuansa bunga & teh aromatik — melati, mawar, lavender, chamomile, bergamot. Biasa pada washed Arabica; terdeteksi via retronasal."
+        case .fruity:
+            "Cerah & segar — sitrus (jeruk, lemon, grapefruit), beri (ceri, blueberry), stone fruit, kismis, tropis (mangga, lychee). (SCA)"
+        case .sourFermented:
+            "Kecerahan asam & fermentasi — winey, cuka apel, buah over-ripe, kombucha. Bedakan asam alami (cerah) vs asetat (menusuk)."
+        case .greenVegetative:
+            "Hijau mentah & herba — rumput segar, polong, zaitun, dill, sage. Wajar dalam jumlah kecil; intens = potensi under-developed."
+        case .other:
+            "Taint & catatan anomali — kertas, tanah, karet, phenolic, kimiawi. Identifikasi posisi & intensitas sebelum menyimpulkan defek."
+        case .roasted:
+            "Reaksi Maillard & sangrai — sereal, malt, roti panggang, dark cocoa, asap, tembakau, arang. Umum pada medium-dark roast."
+        case .spices:
+            "Rempah aromatik kering — lada hitam, cengkih, pala, kayu manis, kapulaga, anise. Sering muncul pada natural process & dark roast."
+        case .nuttyCocoa:
+            "Lemak biji & kakao — hazelnut, almond, walnut, cocoa nib, dark chocolate, peanut butter. Umum pada medium roast washed bean."
         }
     }
 }

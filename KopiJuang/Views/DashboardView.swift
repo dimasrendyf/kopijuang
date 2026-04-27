@@ -42,7 +42,7 @@ struct DashboardView: View {
                         // 4. History Section
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Riwayat Palate")
-                                .font(.headline)
+                                .font(.title2.bold())
                                 .padding(.horizontal)
                             
                             if completedSessions.isEmpty {
@@ -59,6 +59,7 @@ struct DashboardView: View {
                                 }
                             }
                         }
+                        .padding(.top, 20)
                     }
                     .padding(.top)
                     .padding(.bottom, 90)
@@ -84,7 +85,7 @@ struct DashboardView: View {
 
 struct SessionRowLabel: View {
     let session: SessionHistory
-
+    
     var body: some View {
         HStack {
             Image(systemName: "checkmark.circle.fill")
@@ -107,36 +108,120 @@ struct SessionRowLabel: View {
 }
 
 struct ProTipCard: View {
+    @State private var currentIndex: Int = 0
+    @State private var animating: Bool = false
+    
+    private var tip: CoffeeTip { CoffeeTipData.all[currentIndex] }
+    private var totalTips: Int { CoffeeTipData.all.count }
+    
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: "lightbulb.fill")
-                .font(.title)
-                .foregroundStyle(.yellow)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: tip.icon)
+                    .font(.title2)
+                    .foregroundStyle(tip.iconColor)
+                    .frame(width: 36, height: 36)
+                    .background(tip.iconColor.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text("Pro Tip")
+                            .font(.caption2.bold())
+                            .foregroundStyle(.secondary)
+                            .textCase(.uppercase)
+                            .tracking(0.8)
+                        
+                        Text(tip.source)
+                            .font(.caption2.bold())
+                            .foregroundStyle(tip.iconColor)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(tip.iconColor.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                    
+                    Text(tip.title)
+                        .font(.subheadline.bold())
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 4) {
+                    Button {
+                        navigate(forward: false)
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                            .frame(width: 28, height: 28)
+                            .background(Color(.tertiarySystemBackground))
+                            .clipShape(Circle())
+                    }
+                    
+                    Button {
+                        navigate(forward: true)
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                            .frame(width: 28, height: 28)
+                            .background(Color(.tertiarySystemBackground))
+                            .clipShape(Circle())
+                    }
+                }
+            }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Pro Tip: Sensory Window")
-                    .font(.subheadline.bold())
-                Text("Sensitivitas lidah terhadap asam & manis berada di puncak pada suhu 50-60°C.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            Text(tip.body)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .opacity(animating ? 0 : 1)
+            
+            HStack(spacing: 5) {
+                ForEach(0..<totalTips, id: \.self) { index in
+                    Capsule()
+                        .frame(width: index == currentIndex ? 16 : 5, height: 5)
+                        .foregroundStyle(index == currentIndex ? tip.iconColor : Color(.tertiarySystemFill))
+                        .animation(.spring(response: 0.3), value: currentIndex)
+                }
+                Spacer()
+                Text("\(currentIndex + 1)/\(totalTips)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
             }
         }
-        .padding()
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
         .cornerRadius(16)
+        .animation(.easeInOut(duration: 0.2), value: animating)
+    }
+    
+    private func navigate(forward: Bool) {
+        withAnimation(.easeOut(duration: 0.15)) {
+            animating = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            currentIndex = forward
+            ? (currentIndex + 1) % totalTips
+            : (currentIndex - 1 + totalTips) % totalTips
+            withAnimation(.easeIn(duration: 0.15)) {
+                animating = false
+            }
+        }
     }
 }
 
 private struct SensoryFlowShowcase: View {
-//    let flow: SensoryFlow
+    //    let flow: SensoryFlow
     var body: some View {
         VStack(alignment: .leading, spacing: -10) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Kenali notes kopimu, bertahap")
                         .font(.headline)
-                    Text("Tiga langkah sederhana yang bikin hidung + lidahmu makin peka.")
+                    Text("Tiga langkah sederhana yang bikin hidung dan lidahmu makin peka.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -150,19 +235,19 @@ private struct SensoryFlowShowcase: View {
                     icon: "nose.fill",
                     title: "Fragrance",
                     subtitle: "Kopi kering (tanpa air)",
-                    bodyText: "Cium bubuk kopi. Tangkap kategori dominan sebelum air mengubah karakter aromanya."
+                    bodyText: "Cium bubuk kopi sebelum diseduh. Ini kesempatan pertamamu — begitu air masuk, aromanya akan berubah."
                 )
                 FlowPage(
                     icon: "drop.circle.fill",
                     title: "Aroma",
-                    subtitle: "Kopi basah (bloom)",
-                    bodyText: "Saat air panas masuk, karakter bisa “bergeser”. Catat perubahan—ini insight mahal."
+                    subtitle: "Kopi basah (setelah bloom)",
+                    bodyText: "Tuang sedikit air panas, lalu cium lagi. Aromanya beda dari tadi? Normal — air mengubah karakter kopi. Catat bedanya."
                 )
                 FlowPage(
                     icon: "mouth.fill",
                     title: "Taste",
-                    subtitle: "Diseruput + retronasal",
-                    bodyText: "Seruput dengan sedikit udara, lalu hembuskan lewat hidung. Rasa jadi lebih utuh."
+                    subtitle: "Seruput pelan, hirup udara",
+                    bodyText: "Jangan langsung ditelan. Seruput sambil sedikit hirup udara, lalu hembuskan lewat hidung. Rasanya jadi jauh lebih kaya."
                 )
             }
             .tabViewStyle(.page(indexDisplayMode: .always))

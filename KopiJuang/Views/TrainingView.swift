@@ -41,6 +41,7 @@ struct TrainingView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
                 }
                 .padding(.top)

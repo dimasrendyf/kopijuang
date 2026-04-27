@@ -50,7 +50,6 @@ struct CuppingChecklistSection: View {
                                 .padding(.horizontal, 12)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 12)
                         .padding(.bottom, 36)
                     }
                 }
@@ -62,7 +61,7 @@ struct CuppingChecklistSection: View {
                     .font(.headline)
             }
         } footer: {
-            Text("Panduan ini disesuaikan dengan praktik pengecapan standar. Silakan sesuaikan kembali dengan parameter alat, rasio, dan metode seduh Anda.")
+            Text("Panduan ini disesuaikan dengan praktik pengecapan standar. Silakan sesuaikan kembali dengan parameter alat, rasio, dan metode seduh kamu.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
