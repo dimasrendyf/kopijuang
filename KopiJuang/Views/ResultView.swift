@@ -35,11 +35,11 @@ struct ResultView: View {
                         Text(viewModel.evaluation.processLevel)
                     }
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .padding(.top, 10)
+                .padding(.top, 4)
                 
                 // 0.5 Fragrance vs Aroma
                 FragranceAromaSummaryCard(
@@ -55,7 +55,7 @@ struct ResultView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Analisis Sensorik")
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                     
                     VStack(spacing: 12) {
                         SensoryBar(label: "Asam", value: viewModel.evaluation.acidity, max: 10)
@@ -73,15 +73,15 @@ struct ResultView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Saran Untuk Seduhan Besok")
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                     
-                    Text(viewModel.brewTipInsight)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                    // Text(viewModel.brewTipInsight)
+                    //     .font(.subheadline.weight(.semibold))
+                    //     .foregroundStyle(.primary)
                     
                     Text(viewModel.brewTipAction)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
@@ -97,37 +97,38 @@ struct ResultView: View {
                         .multilineTextAlignment(.center)
                     Text("Tidak ada jawaban benar atau salah. Pilih yang paling mendekati pengalaman lidahmu, lalu kita lanjut eksplorasi layer berikutnya.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .multilineTextAlignment(.center)
                     
                     LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                         ForEach(FlavorCategory.allCases, id: \.self) { category in
-                            CategoryButton(category: category) {
+                            CategoryButton(
+                                category: category,
+                                isSelected: viewModel.selectedCategory == category
+                            ) {
                                 viewModel.checkAnswer(category, modelContext: modelContext, userProgresses: userProgresses)
                             }
-                            .overlay(
-                                Image(systemName: viewModel.selectedCategory == category ? "checkmark.circle.fill" : "circle")
-                                    .font(.title3)
-                                    .foregroundStyle(viewModel.selectedCategory == category ? .brown : .secondary)
-                                    .padding(12),
-                                alignment: .topTrailing
-                            )
                         }
                     }
 
                     Button {
                         viewModel.showDiscovery = true
                     } label: {
-                        Text("Butuh bantuan: catatan pengecapan")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .padding(.vertical, 10)
+                        HStack(spacing: 6) {
+                            Image(systemName: "questionmark.circle")
+                                .font(.subheadline)
+                            Text("Butuh bantuan: catatan pengecapan")
+                                .font(.subheadline)
+                        }
+                            .foregroundStyle(.brown)
+                            .padding(.vertical, 12)
                             .frame(maxWidth: .infinity)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(.systemGray4), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(Color.brown.opacity(0.5), lineWidth: 1)
                             )
                     }
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal)
             }
@@ -191,44 +192,65 @@ struct SensoryBar: View {
 
 struct CategoryButton: View {
     let category: FlavorCategory
+    let isSelected: Bool
     let action: () -> Void
     
     var body: some View {
+        let descriptor = CategoryPickerDescriptors.descriptor(for: category, stage: .taste)
+
         Button(action: action) {
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(category.categoryAccentColor.opacity(0.18))
-                        .frame(width: 44, height: 44)
-                    Image(systemName: category.categoryIconName)
-                        .font(.title3.weight(.semibold))
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.brown.opacity(isSelected ? 0.18 : 0.10))
+                            .frame(width: 36, height: 36)
+                        Image(systemName: category.pickerGridIconName)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.brown)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(category.rawValue)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text(descriptor.summary)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.primary.opacity(0.72))
+                            .lineLimit(2)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(isSelected ? .brown : Color.primary.opacity(0.55))
                 }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(category.rawValue)
-                        .font(.headline)
-                    Text(category.categoryBlurb)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
+
+                HStack(spacing: 8) {
+                    ForEach(descriptor.examples.prefix(4), id: \.self) { chip in
+                        Text(chip)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.brown)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.brown.opacity(0.10))
+                            .clipShape(Capsule())
+                    }
+                    Spacer(minLength: 0)
                 }
-                Spacer(minLength: 0)
             }
-            .foregroundStyle(category.categoryAccentColor)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
             .background(
-                LinearGradient(
-                    colors: [category.categoryAccentColor.opacity(0.16), category.categoryAccentColor.opacity(0.06)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(isSelected ? Color.brown.opacity(0.10) : Color(.systemBackground))
             )
-            .cornerRadius(16)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(category.categoryAccentColor.opacity(0.35), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(isSelected ? Color.brown.opacity(0.45) : Color(.systemGray4), lineWidth: 1)
             )
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -262,10 +284,12 @@ struct FeedbackView: View {
                 VStack(spacing: 6) {
                     Text(isCorrect ? "Kamu mengenali cita rasa baru!" : "Hampir tepat!")
                         .font(.title.bold())
+                        .multilineTextAlignment(.center)
+                        
                     if isCorrect {
                         Text("Gitu dong—kamu baca nuansa, bukan cuma menebak label.")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                             .multilineTextAlignment(.center)
                     }
                 }
@@ -305,7 +329,7 @@ struct FeedbackView: View {
                 }
                 
                 Button("Tutup") { dismiss() }
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
             }
             .padding()
         }
@@ -363,7 +387,7 @@ private struct FragranceAromaSummaryCard: View {
             HStack(spacing: 10) {
                 summaryPill(title: "Dry", category: fragranceCategory, intensity: fragranceIntensity)
                 Image(systemName: "arrow.right")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.55))
                 summaryPill(title: "Wet", category: aromaCategory, intensity: aromaIntensity)
             }
         }
@@ -377,13 +401,13 @@ private struct FragranceAromaSummaryCard: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.65))
             Text(category.rawValue)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.brown)
             Text("Intensity \(Int(intensity))/10")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.65))
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)

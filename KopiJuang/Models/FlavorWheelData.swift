@@ -73,7 +73,7 @@ private let fruity = FlavorWheelNode(
     description: "Spektrum buah: sitrus, beri, hingga buah tropis dengan tingkat keasaman yang cerah.",
     layer: 1, parent: nil, children: [
         FlavorWheelNode(
-            id: "berry", name: "Beri", description: "Keluarga beri dengan profil asam-manis yang khas.",
+            id: "berry", name: "Beri", description: "Kategori beri dengan profil asam-manis yang khas.",
             layer: 2, parent: FlavorCategory.fruity.rawValue, children: [
                 FlavorWheelNode(id: "blackberry", name: "Blackberry", description: "Blackberry dengan karakter buah gelap dan asam kental.", layer: 3, parent: "berry", children: []),
                 FlavorWheelNode(id: "raspberry", name: "Frambos", description: "Frambos dengan keasaman segar yang terang.", layer: 3, parent: "berry", children: []),

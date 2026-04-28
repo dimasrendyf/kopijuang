@@ -24,18 +24,18 @@ struct SensoryEvaluation: Identifiable {
     var processLevel: String
     
     // State 1: Fragrance (Dry Coffee)
-    var fragranceIntensity: Double // 1...10
+    var fragranceIntensity: Double // 0...10
     var fragranceCategory: FlavorCategory
     
     // State 2: Aroma (Wet Coffee / Bloom)
     var aromaContrast: AromaContrast
-    var aromaIntensity: Double // 1...10
+    var aromaIntensity: Double // 0...10
     var aromaCategory: FlavorCategory
     
     // State 3: Taste (Sip + Retronasal)
-    var acidity: Double // 1...10
-    var sweetness: Double // 1...10
-    var bitterness: Double // 1...10
-    var bodyScore: Double // 1...10
+    var acidity: Double // 0...10
+    var sweetness: Double // 0...10
+    var bitterness: Double // 0...10
+    var bodyScore: Double // 0...10
     var tasteCategory: FlavorCategory // Dominan rasa saat taste
 }

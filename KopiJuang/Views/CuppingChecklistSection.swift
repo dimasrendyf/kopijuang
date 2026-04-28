@@ -45,7 +45,7 @@ struct CuppingChecklistSection: View {
                             Text(page.detail)
                                 .font(.subheadline)
                                 .multilineTextAlignment(.center)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(.horizontal, 12)
                         }
@@ -63,7 +63,7 @@ struct CuppingChecklistSection: View {
         } footer: {
             Text("Panduan ini disesuaikan dengan praktik pengecapan standar. Silakan sesuaikan kembali dengan parameter alat, rasio, dan metode seduh kamu.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
         }
     }
 }

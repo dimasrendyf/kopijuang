@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Snapshot ringkas yang dipersist untuk riwayat; nilai rasa 1...10.
+/// Snapshot ringkas yang dipersist untuk riwayat; nilai rasa 0...10.
 struct SessionSnapshot: Equatable, Sendable {
     var beanName: String
     var beanOrigin: String

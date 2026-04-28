@@ -24,7 +24,7 @@ struct DiscoveryNotesView: View {
                         .font(.title2.bold())
                     Text(footerCopy)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.vertical, 4)
@@ -45,7 +45,7 @@ struct DiscoveryNotesView: View {
                                 .font(.subheadline.weight(.semibold))
                             Text(stage.learningLine(for: category))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                         }
                     }
                 }

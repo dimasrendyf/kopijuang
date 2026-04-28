@@ -33,11 +33,11 @@ struct FlavorDetailView: View {
                     if flavor.isUnlocked {
                         Text("Level: \(flavor.familiarityLevel) • Pernah dirasakan \(flavor.experienceCount)x")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     } else {
                         Text("Teruslah bereksplorasi untuk membuka notes ini.")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     }
                 }
                 
@@ -46,8 +46,8 @@ struct FlavorDetailView: View {
                     // --- UNLOCKED: Educational Content ---
                     VStack(alignment: .leading, spacing: 20) {
                         InfoCard(title: "Profil Rasa", content: flavor.description)
-                        InfoCard(title: "SCA Data & Science", content: "Secara ilmiah, \(flavor.name) muncul karena senyawa volatile aromatik yang dominan pada jenis beans tertentu. Sering ditemukan pada proses Natural atau Honey.")
-                        InfoCard(title: "Tips Latihan", content: "Coba bandingkan dengan kopi berproses Washed untuk merasakan perbedaan kebersihannya.")
+                        WCRSensoryTrainingView(guide: WCRSensoryTrainingData.guide(for: flavor.id))
+                        InfoCard(title: "Tips Latihan", content: "Latih satu rasa per sesi. Bandingkan kopi saat panas dan hangat. Catat kata pertama yang muncul, bukan jawaban benar-salah.")
                     }
                     .padding()
                 } else {

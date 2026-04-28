@@ -16,20 +16,18 @@ struct AtlasView: View {
     
     var body: some View {
         @Bindable var viewModel = viewModel
-        NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(viewModel.filteredFlavors(from: userProgresses)) { flavor in
-                        NavigationLink(destination: FlavorDetailView(flavor: flavor)) {
-                            FlavorCard(flavor: flavor)
-                        }
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(viewModel.filteredFlavors(from: userProgresses)) { flavor in
+                    NavigationLink(destination: FlavorDetailView(flavor: flavor)) {
+                        FlavorCard(flavor: flavor)
                     }
                 }
-                .padding()
             }
-            .navigationTitle("Flavor Atlas")
-            .searchable(text: $viewModel.searchText, prompt: "Cari rasa...")
+            .padding()
         }
+        .navigationTitle("Flavor Atlas")
+        .searchable(text: $viewModel.searchText, prompt: "Cari rasa...")
     }
 }
 
@@ -53,7 +51,7 @@ struct FlavorCard: View {
             if flavor.isUnlocked {
                 Text("\(flavor.familiarityLevel) • \(flavor.experienceCount)x")
                     .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
             }
         }
         .frame(height: 140)

@@ -16,68 +16,66 @@ struct DashboardView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottomTrailing) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        
-                        // 1. Motivational Greeting
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Halo, Future Barista!")
-                                .font(.title2.bold())
-                            Text("Setiap tegukan adalah langkah menuju keahlian.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
+        ZStack(alignment: .bottomTrailing) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    
+                    // 1. Motivational Greeting
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Halo, Future Barista!")
+                            .font(.title2.bold())
+                        Text("Setiap tegukan adalah langkah menuju keahlian.")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.primary.opacity(0.72))
+                    }
+                    .padding(.horizontal)
+                    
+                    // 2. Big Learning Section
+                    SensoryFlowShowcase()
                         .padding(.horizontal)
-                        
-                        // 2. Big Learning Section
-                        SensoryFlowShowcase()
+                    
+                    // 3. Quick Tip
+                    ProTipCard()
+                        .padding(.horizontal)
+                    
+                    // 4. History Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Riwayat Palate")
+                            .font(.title2.bold())
                             .padding(.horizontal)
                         
-                        // 3. Quick Tip
-                        ProTipCard()
-                            .padding(.horizontal)
-                        
-                        // 4. History Section
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Riwayat Palate")
-                                .font(.title2.bold())
+                        if completedSessions.isEmpty {
+                            EmptyHistoryCard()
                                 .padding(.horizontal)
-                            
-                            if completedSessions.isEmpty {
-                                EmptyHistoryCard()
-                                    .padding(.horizontal)
-                            } else {
-                                ForEach(completedSessions) { session in
-                                    NavigationLink {
-                                        SessionHistoryDetailView(session: session)
-                                    } label: {
-                                        SessionRowLabel(session: session)
-                                    }
-                                    .buttonStyle(.plain)
+                        } else {
+                            ForEach(completedSessions) { session in
+                                NavigationLink {
+                                    SessionHistoryDetailView(session: session)
+                                } label: {
+                                    SessionRowLabel(session: session)
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
-                        .padding(.top, 20)
                     }
-                    .padding(.top)
-                    .padding(.bottom, 90)
+                    .padding(.top, 20)
                 }
-                .navigationTitle("KopiJuang")
-                
-                NavigationLink(destination: CoffeeSetupView()) {
-                    Image(systemName: "plus")
-                        .font(.title2.bold())
-                        .foregroundStyle(.white)
-                        .frame(width: 60, height: 60)
-                        .background(Color.brown)
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
-                }
-                .padding(.trailing)
-                .padding(.bottom, 18)
+                .padding(.top)
+                .padding(.bottom, 90)
             }
+            .navigationTitle("KopiJuang")
+            
+            NavigationLink(destination: CoffeeSetupView()) {
+                Image(systemName: "plus")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+                    .frame(width: 60, height: 60)
+                    .background(Color.brown)
+                    .clipShape(Circle())
+                    .shadow(radius: 5)
+            }
+            .padding(.trailing)
+            .padding(.bottom, 18)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -93,12 +91,12 @@ struct SessionRowLabel: View {
             
             VStack(alignment: .leading) {
                 Text(session.beanName).font(.body.bold())
-                Text(session.finalCategory).font(.caption).foregroundStyle(.secondary)
+                Text(session.finalCategory).font(.caption).foregroundStyle(Color.primary.opacity(0.72))
             }
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Color.primary.opacity(0.45))
         }
         .padding()
         .background(Color(.secondarySystemBackground))
@@ -109,74 +107,20 @@ struct SessionRowLabel: View {
 
 struct ProTipCard: View {
     @State private var currentIndex: Int = 0
-    @State private var animating: Bool = false
-    
-    private var tip: CoffeeTip { CoffeeTipData.all[currentIndex] }
+
+    private var tip: CoffeeTip { CoffeeTipData.all[safe: currentIndex] ?? CoffeeTipData.all[0] }
     private var totalTips: Int { CoffeeTipData.all.count }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: tip.icon)
-                    .font(.title2)
-                    .foregroundStyle(tip.iconColor)
-                    .frame(width: 36, height: 36)
-                    .background(tip.iconColor.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text("Pro Tip")
-                            .font(.caption2.bold())
-                            .foregroundStyle(.secondary)
-                            .textCase(.uppercase)
-                            .tracking(0.8)
-                        
-                        Text(tip.source)
-                            .font(.caption2.bold())
-                            .foregroundStyle(tip.iconColor)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(tip.iconColor.opacity(0.12))
-                            .clipShape(Capsule())
-                    }
-                    
-                    Text(tip.title)
-                        .font(.subheadline.bold())
-                }
-                
-                Spacer()
-                
-                HStack(spacing: 4) {
-                    Button {
-                        navigate(forward: false)
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.caption.bold())
-                            .foregroundStyle(.secondary)
-                            .frame(width: 28, height: 28)
-                            .background(Color(.tertiarySystemBackground))
-                            .clipShape(Circle())
-                    }
-                    
-                    Button {
-                        navigate(forward: true)
-                    } label: {
-                        Image(systemName: "chevron.right")
-                            .font(.caption.bold())
-                            .foregroundStyle(.secondary)
-                            .frame(width: 28, height: 28)
-                            .background(Color(.tertiarySystemBackground))
-                            .clipShape(Circle())
-                    }
+            TabView(selection: $currentIndex) {
+                ForEach(CoffeeTipData.all.indices, id: \.self) { index in
+                    ProTipPage(tip: CoffeeTipData.all[index])
+                        .tag(index)
                 }
             }
-            
-            Text(tip.body)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .opacity(animating ? 0 : 1)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 116)
             
             HStack(spacing: 5) {
                 ForEach(0..<totalTips, id: \.self) { index in
@@ -188,28 +132,57 @@ struct ProTipCard: View {
                 Spacer()
                 Text("\(currentIndex + 1)/\(totalTips)")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color.primary.opacity(0.55))
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
         .cornerRadius(16)
-        .animation(.easeInOut(duration: 0.2), value: animating)
     }
-    
-    private func navigate(forward: Bool) {
-        withAnimation(.easeOut(duration: 0.15)) {
-            animating = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            currentIndex = forward
-            ? (currentIndex + 1) % totalTips
-            : (currentIndex - 1 + totalTips) % totalTips
-            withAnimation(.easeIn(duration: 0.15)) {
-                animating = false
+}
+
+private struct ProTipPage: View {
+    let tip: CoffeeTip
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: tip.icon)
+                    .font(.title2)
+                    .foregroundStyle(tip.iconColor)
+                    .frame(width: 36, height: 36)
+                    .background(tip.iconColor.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text("Pro Tip")
+                            .font(.caption2.bold())
+                            .foregroundStyle(Color.primary.opacity(0.65))
+                            .textCase(.uppercase)
+                            .tracking(0.8)
+
+                        Text(tip.source)
+                            .font(.caption2.bold())
+                            .foregroundStyle(tip.iconColor)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(tip.iconColor.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+
+                    Text(tip.title)
+                        .font(.subheadline.bold())
+                }
             }
+
+            Text(tip.body)
+                .font(.caption)
+                .foregroundStyle(Color.primary.opacity(0.72))
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -223,7 +196,7 @@ private struct SensoryFlowShowcase: View {
                         .font(.headline)
                     Text("Tiga langkah sederhana yang bikin hidung dan lidahmu makin peka.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
                 Spacer()
                 Image(systemName: "sparkles")
@@ -289,7 +262,7 @@ private struct FlowPage: View {
                         .font(.headline)
                     Text(subtitle)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.65))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Color(.systemBackground))
@@ -297,7 +270,7 @@ private struct FlowPage: View {
                 }
                 Text(bodyText)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
             }
             
@@ -320,13 +293,19 @@ private struct EmptyHistoryCard: View {
                     .font(.subheadline.bold())
                 Text("Mulai 1 sesi untuk mulai membangun “palate memory”.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
             }
             Spacer()
         }
         .padding()
         .background(Color(.secondarySystemBackground))
         .cornerRadius(16)
+    }
+}
+
+private extension Collection {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
 

@@ -39,7 +39,7 @@ struct TrainingView: View {
 
                         Text(viewModel.stageSubtitle)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
@@ -73,7 +73,7 @@ struct TrainingView: View {
 
                 Text(viewModel.referenceNote)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .leading)

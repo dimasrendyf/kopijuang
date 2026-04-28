@@ -22,7 +22,7 @@ struct CoffeeSetupView: View {
                     
                     Text("Ceritakan sedikit tentang kopi ini. Kami memandu indramu menemukan rasa di cangkir.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -42,7 +42,7 @@ struct CoffeeSetupView: View {
                 if !viewModel.roastLevel.isEmpty {
                     Text(viewModel.roastDescription(for: viewModel.roastLevel))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
                 
                 Picker("Proses", selection: $viewModel.processLevel) {
@@ -53,14 +53,14 @@ struct CoffeeSetupView: View {
                 if !viewModel.processLevel.isEmpty {
                     Text(viewModel.processDescription(for: viewModel.processLevel))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
             } header: {
                 Text("Detail beans")
                     .font(.headline)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.primary)
             }
-            .padding(.top, 24)
+            .padding(.top, 4)
         }
         .scrollDismissesKeyboard(.interactively)
         .onAppear {

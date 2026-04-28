@@ -48,7 +48,7 @@ enum CoffeeTipData {
             icon: "cloud.fill",
             iconColor: .cyan,
             title: "Bloom / Pre-infusion",
-            body: "TSebelum tuang semua air, siram dulu 2× berat kopi dan tunggu 30 detik. Lihat kopinya mengembang? Itu CO₂ keluar — tandanya kopi segar, dan ekstraksi akan lebih merata.",
+            body: "Sebelum tuang semua air, siram dulu 2× berat kopi dan tunggu 30 detik. Lihat kopinya mengembang? Itu CO₂ keluar — tandanya kopi segar, dan ekstraksi akan lebih merata.",
             source: "SCA"
         ),
         CoffeeTip(

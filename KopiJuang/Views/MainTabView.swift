@@ -12,24 +12,26 @@ struct MainTabView: View {
     @State private var viewModel = MainTabViewModel()
 
     var body: some View {
-        TabView(selection: $viewModel.selectedTab) {
-            DashboardView()
-                .id("dashboard-\(dashboardResetCounter)")
-                .tabItem {
-                    Label("Dashboard", systemImage: "house.fill")
-                }
-                .tag(0)
-            
-            AtlasView()
-                .tabItem {
-                    Label("Atlas", systemImage: "book.fill")
-                }
-                .tag(1)
+        NavigationStack {
+            TabView(selection: $viewModel.selectedTab) {
+                DashboardView()
+                    .tabItem {
+                        Label("Dashboard", systemImage: "house.fill")
+                    }
+                    .tag(0)
+                
+                AtlasView()
+                    .tabItem {
+                        Label("Atlas", systemImage: "book.fill")
+                    }
+                    .tag(1)
+            }
+            .accentColor(.brown)
+            .onChange(of: dashboardResetCounter) { _, _ in
+                viewModel.resetToDashboardTab()
+            }
         }
-        .accentColor(.brown)
-        .onChange(of: dashboardResetCounter) { _, _ in
-            viewModel.resetToDashboardTab()
-        }
+        .id("navigation-root-\(dashboardResetCounter)")
     }
 }
 

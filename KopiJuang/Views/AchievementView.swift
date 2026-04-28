@@ -26,14 +26,14 @@ struct AchievementView: View {
                 Text("Kamu berhasil mengidentifikasi profil rasa dari kopi \(evaluation.beanName).")
                     .font(.body)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                     .padding(.horizontal, 30)
             }
             
             VStack(spacing: 8) {
                 Text("Notes yang kamu dapat:")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                 
                 HStack {
                     Text(evaluation.tasteCategory.rawValue)

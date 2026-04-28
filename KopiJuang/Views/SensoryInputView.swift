@@ -92,7 +92,7 @@ struct SensoryInputView: View {
                 .font(.title2.bold())
             Text(viewModel.step.subtitle)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
 
             StepIndicator(current: viewModel.step)
                 .padding(.top, 4)
@@ -174,20 +174,20 @@ private struct SessionMetaRow: View {
         HStack(spacing: 8) {
             Label(beanName, systemImage: "cup.and.saucer.fill")
             
-            Text("•").foregroundStyle(.secondary)
+            Text("•").foregroundStyle(Color.primary.opacity(0.55))
             
             Label(beanOrigin, systemImage: "map.fill")
             
-            Text("•").foregroundStyle(.secondary)
+            Text("•").foregroundStyle(Color.primary.opacity(0.55))
             
             Label(roastLevel, systemImage: "flame.fill")
             
-            Text("•").foregroundStyle(.secondary)
+            Text("•").foregroundStyle(Color.primary.opacity(0.55))
             
             Label(processLevel, systemImage: "drop.fill")
         }
         .font(.caption)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(Color.primary.opacity(0.72))
         .lineLimit(1)
         .minimumScaleFactor(0.8)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -246,7 +246,7 @@ private struct FragranceStepView: View {
                     Spacer()
                     Text("Cium sekarang")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .padding(.bottom, 12)
                 }
             }
@@ -260,21 +260,21 @@ private struct FragranceStepView: View {
             
             VStack(spacing: 14) {
                 InputCard(
-                    title: "Seberapa kuat wanginya?",
-                    prompt: "Geser slider dari kiri (wangi tipis, hampir tidak tercium) ke kanan (wangi tajam, langsung tercium)."
+                    title: "Seberapa jelas aromanya?",
+                    prompt: "Cium 3 kali pendek. Geser rendah kalau aromanya samar, geser tinggi kalau aromanya langsung kebaca tanpa usaha."
                 ) {
                     MetricScale(
                         value: $intensity,
-                        range: 1...10,
+                        range: 0...10,
                         step: 1,
-                        lowText: "Halus",
+                        lowText: "Belum terasa",
                         highText: "Tajam"
                     )
                 }
                 
                 InputCard(
-                    title: "Wanginya mirip apa?",
-                    prompt: "Pilih satu kategori yang paling mendekati apa yang kamu cium. Tidak ada jawaban salah — percaya instingmu."
+                    title: "Aromanya mengarah ke mana?",
+                    prompt: "Pilih kategori aroma yang paling dekat: buah, bunga, manis, kacang, rempah, panggang, hijau, asam-fermentasi, atau aroma asing. Pilih kesan pertama yang paling kuat."
                 ) {
                     CategoryPickerGrid(stage: .fragrance, selection: $category) {
                         showDiscovery = true
@@ -345,22 +345,22 @@ private struct AromaStepView: View {
                 }
                 
                 InputCard(
-                    title: "Seberapa kuat sekarang?",
-                    prompt: "Geser slider untuk menilai kekuatan wangi setelah kopi kena air."
+                    title: "Seberapa jelas aroma setelah kena air?",
+                    prompt: "Air panas bisa membuka aroma baru. Geser rendah kalau tetap halus, geser tinggi kalau aromanya makin naik dan mudah dikenali."
                 ) {
                     MetricScale(
                         value: $wetIntensity,
-                        range: 1...10,
+                        range: 0...10,
                         step: 1,
-                        lowText: "Halus",
+                        lowText: "Belum terasa",
                         highText: "Tajam"
                     )
                 }
                 
                 if contrast != .same {
                     InputCard(
-                        title: "Sekarang mirip apa?",
-                        prompt: "Pilih kategori yang paling mendekati wangi kopi setelah kena air. Beda dari tadi? Itu insight yang berharga."
+                    title: "Aroma basahnya mengarah ke mana?",
+                    prompt: "Bandingkan dengan aroma kering. Kalau berubah, pilih kategori aroma baru yang paling terasa setelah bloom."
                     ) {
                         CategoryPickerGrid(stage: .aroma, selection: $wetCategory) {
                             showDiscovery = true
@@ -374,7 +374,7 @@ private struct AromaStepView: View {
                         HStack {
                             Text("Kategori wet")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                             Spacer()
                             if let dry = dryCategory {
                                 Text(dry.rawValue)
@@ -383,7 +383,7 @@ private struct AromaStepView: View {
                             } else {
                                 Text("—")
                                     .font(.headline)
-                                    .foregroundStyle(.tertiary)
+                                    .foregroundStyle(Color.primary.opacity(0.55))
                             }
                         }
                     }
@@ -433,13 +433,13 @@ private struct ContrastTrackerCard: View {
             HStack(spacing: 10) {
                 ContrastPill(title: "Kering", category: dryCategory)
                 Image(systemName: "arrow.right")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.55))
                 ContrastPill(title: "Wet/Bloom", category: wetCategory)
             }
             
             Text("Misalnya: saat kering tercium cokelat, setelah air masuk berubah jadi buah. Perubahan seperti ini normal dan informatif.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
         }
         .padding()
         .background(Color(.secondarySystemBackground))
@@ -455,7 +455,7 @@ private struct ContrastPill: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.65))
             Text(category.rawValue)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.brown)
@@ -492,11 +492,11 @@ private struct TasteStepView: View {
             .padding(.horizontal)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Seberapa terasa?")
+                Text("Nilai rasa dasar di mulut")
                     .font(.title3.bold())
-                Text("Geser masing-masing slider dari 1 (hampir tidak terasa) sampai 10 (sangat menonjol).")
+                Text("Nilai satu per satu. Asam = segar/bright, manis = bulat/nyaman, pahit = getir, body = tebal-tipisnya cairan di mulut.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -508,9 +508,9 @@ private struct TasteStepView: View {
                     subtitle: "Rasa segar, seperti jeruk atau apel.",
                     detail: "Bukan asam yang menusuk — lebih ke sensasi bright yang bikin pengen nyeruput lagi.",
                     value: $acidity,
-                    range: 1...10,
+                    range: 0...10,
                     step: 1,
-                    lowText: "Flat",
+                    lowText: "Belum terasa",
                     highText: "Bright"
                 )
                 
@@ -519,9 +519,9 @@ private struct TasteStepView: View {
                     subtitle: "Manis alami, bukan kayak gula.",
                     detail: "Manis yang bikin rasa terasa bulat dan nyaman. Semakin terasa, biasanya semakin enak ditelan.",
                     value: $sweetness,
-                    range: 1...10,
+                    range: 0...10,
                     step: 1,
-                    lowText: "Kering",
+                    lowText: "Belum terasa",
                     highText: "Round"
                 )
                 
@@ -530,9 +530,9 @@ private struct TasteStepView: View {
                     subtitle: "Pahit saat kopi diteguk.",
                     detail: "Pahit ringan itu wajar dan bisa bikin rasa lebih berstruktur. Nilai sesuai yang kamu rasakan.",
                     value: $bitterness,
-                    range: 1...10,
+                    range: 0...10,
                     step: 1,
-                    lowText: "Lembut",
+                    lowText: "Belum terasa",
                     highText: "Tajam"
                 )
                 
@@ -541,17 +541,17 @@ private struct TasteStepView: View {
                     subtitle: "Ringan atau tebal di mulut?",
                     detail: "Ini soal tekstur cairan saat diminum — kayak bedanya air biasa sama susu. Tidak harus tebal untuk enak.",
                     value: $bodyScore,
-                    range: 1...10,
+                    range: 0...10,
                     step: 1,
-                    lowText: "Ringan",
+                    lowText: "Belum terasa",
                     highText: "Tebal"
                 )
             }
             .padding(.horizontal)
 
             InputCard(
-                title: "Kesanmu secara keseluruhan?",
-                prompt: "Setelah nyeruput, pilih satu kategori yang paling menggambarkan rasa kopi ini secara keseluruhan."
+                title: "Rasa utamanya masuk kategori mana?",
+                prompt: "Setelah slurp dan hembus lewat hidung, pilih kategori rasa yang paling dominan. Jangan cari jawaban sempurna; pilih yang paling mirip."
             ) {
                 CategoryPickerGrid(stage: .taste, selection: $category) {
                     showDiscovery = true
@@ -615,7 +615,7 @@ private struct TasteBridgeCard: View {
                 Label(processHint, systemImage: "drop.fill")
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.primary.opacity(0.72))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -645,7 +645,7 @@ private struct SlurpMentorCard: View {
                     .font(.subheadline.bold())
                 Text("Jangan langsung ditelan. Seruput sambil sedikit hirup udara, lalu hembuskan lewat hidung. Rasanya jadi jauh lebih kaya.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
             }
             Spacer(minLength: 0)
         }
@@ -694,7 +694,7 @@ private struct MetricSlider: View {
                 Spacer()
                 Text(highText).font(.caption2)
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.primary.opacity(0.65))
         }
     }
 }
@@ -715,17 +715,17 @@ private struct TasteMetricCard: View {
                 .font(.headline)
             Text(subtitle)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
                 .fixedSize(horizontal: false, vertical: true)
             Text(detail)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.65))
                 .fixedSize(horizontal: false, vertical: true)
             
             HStack {
                 Text("Nilai saat ini")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.65))
                 Spacer()
                 Text("\(Int(value)) / 10")
                     .font(.caption.weight(.semibold).monospacedDigit())
@@ -772,7 +772,7 @@ private struct MetricScale: View {
                 Spacer()
                 Text(highText).font(.caption2)
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.primary.opacity(0.65))
         }
     }
 }
@@ -879,7 +879,7 @@ private struct StepIntroCard: View {
                 .foregroundStyle(.brown)
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -911,7 +911,7 @@ private struct InputCard<Content: View>: View {
                 .foregroundStyle(.brown)
             Text(prompt)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
                 .fixedSize(horizontal: false, vertical: true)
             content
         }
@@ -969,7 +969,7 @@ private struct CategoryPickerGrid: View {
                             .font(.headline)
                         Text(descriptor.summary)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     }
                     
                     Spacer()
@@ -1002,14 +1002,14 @@ private struct CategoryPickerGrid: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "questionmark.circle")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.65))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Bingung pilih yang mana?")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                     Text("Buka panduan pengecapan — ada contoh aroma dan rasa untuk setiap kategori.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.65))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()

@@ -35,7 +35,7 @@ struct CascadingQuizView: View {
                 Text(viewModel.transitionPrompt(for: parent))
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary.opacity(0.72))
                     .padding(.horizontal)
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
@@ -48,7 +48,7 @@ struct CascadingQuizView: View {
                                     .font(.headline)
                                 Text(child.description)
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.primary.opacity(0.65))
                                     .multilineTextAlignment(.center)
                                     .lineLimit(3)
                             }
@@ -72,11 +72,11 @@ struct CascadingQuizView: View {
                     if let selectedNode = viewModel.selectedNode {
                         Text("Pilihanmu: \(selectedNode.name).")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     } else {
                         Text("Pilih satu opsi yang paling mendekati sensasi kamu.")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     }
 
                     Button {
@@ -169,7 +169,7 @@ struct FlavorGuidanceSheet: View {
 
                         Text(guidance.intro)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding()
@@ -177,11 +177,17 @@ struct FlavorGuidanceSheet: View {
                     .background(Color.brown.opacity(0.07))
                     .clipShape(RoundedRectangle(cornerRadius: 14))
 
+                    WCRSensoryTrainingView(guide: WCRSensoryTrainingData.guide(for: parentNode.id))
+
                     // Per-child hints
                     VStack(spacing: 12) {
                         ForEach(parentNode.children) { child in
                             if let hint = guidance.hints.first(where: { $0.nodeId == child.id }) {
-                                FlavorHintRow(node: child, hint: hint.sensoryHint)
+                                FlavorHintRow(
+                                    node: child,
+                                    hint: hint.sensoryHint,
+                                    guide: WCRSensoryTrainingData.specificGuide(for: child.id)
+                                )
                             }
                         }
                     }
@@ -189,7 +195,7 @@ struct FlavorGuidanceSheet: View {
                     // SCA note
                     Text("Panduan ini berdasarkan SCA Flavor Wheel & WCR Sensory Lexicon. Deskriptor bersifat subjektif — catat apa yang kamu rasakan, bukan apa yang seharusnya.")
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(Color.primary.opacity(0.55))
                         .padding(.top, 4)
                 }
                 .padding()
@@ -201,9 +207,9 @@ struct FlavorGuidanceSheet: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark.fill")
+                        Image(systemName: "xmark")
                             .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.primary.opacity(0.72))
                     }
                 }
             }
@@ -214,29 +220,40 @@ struct FlavorGuidanceSheet: View {
 private struct FlavorHintRow: View {
     let node: FlavorWheelNode
     let hint: String
+    let guide: SensoryTrainingGuide?
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(spacing: 2) {
-                Text(node.name)
-                    .font(.subheadline.bold())
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text(node.description)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(spacing: 2) {
+                    Text(node.name)
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(node.description)
+                        .font(.caption2)
+                        .foregroundStyle(Color.primary.opacity(0.55))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity)
+
+                Rectangle()
+                    .frame(width: 1)
+                    .foregroundStyle(Color(.systemGray4))
+
+                Text(hint)
+                    .font(.caption)
+                    .foregroundStyle(Color.primary.opacity(0.72))
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity)
 
-            Rectangle()
-                .frame(width: 1)
-                .foregroundStyle(Color(.systemGray4))
-
-            Text(hint)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if let guide {
+                Divider()
+                Text("Latihan: \(guide.smellTraining)")
+                    .font(.caption2)
+                    .foregroundStyle(Color.primary.opacity(0.65))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding()
         .background(Color(.systemBackground))

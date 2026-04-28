@@ -35,7 +35,7 @@ struct SessionHistoryDetailView: View {
                 .font(.headline)
             Text("Hanya tersimpan: bean, roast, proses, kategori L1. Sesi setelah update menyimpan skor penuh.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -55,7 +55,7 @@ struct SessionHistoryDetailView: View {
                 .font(.title2.bold())
             Text(dateText)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -73,11 +73,11 @@ struct SessionHistoryDetailView: View {
         .cornerRadius(16)
 
         VStack(alignment: .leading, spacing: 10) {
-            Text("Fragrance & aroma")
+            Text("Fragrance & Aroma")
                 .font(.headline)
-            Text("Kering: \(snapshot.fragranceCategory) — intens. \(Int(snapshot.fragranceIntensity))/10")
+            Text("Saat kering: \(snapshot.fragranceCategory) — kekuatan \(Int(snapshot.fragranceIntensity))/10")
                 .font(.subheadline)
-            Text("Basah: \(snapshot.aromaCategory) — kontras \(snapshot.aromaContrast) — intens. \(Int(snapshot.aromaIntensity))/10")
+            Text("Setelah air masuk: \(snapshot.aromaCategory) — kekuatan \(Int(snapshot.aromaIntensity))/10")
                 .font(.subheadline)
         }
         .padding()
@@ -86,13 +86,13 @@ struct SessionHistoryDetailView: View {
         .cornerRadius(16)
 
         VStack(alignment: .leading, spacing: 10) {
-            Text("Taste (slurp)")
+            Text("Rasa kopi")
                 .font(.headline)
             SensoryBar(label: "Asam", value: snapshot.acidity, max: 10)
             SensoryBar(label: "Manis", value: snapshot.sweetness, max: 10)
             SensoryBar(label: "Pahit", value: snapshot.bitterness, max: 10)
             SensoryBar(label: "Body", value: snapshot.bodyScore, max: 10)
-            Text("Dominan peta (input): \(snapshot.tasteCategory)")
+            Text("Dominan notes: \(snapshot.tasteCategory)")
                 .font(.subheadline)
                 .padding(.top, 4)
         }
@@ -102,7 +102,7 @@ struct SessionHistoryDetailView: View {
         .cornerRadius(16)
 
         VStack(alignment: .leading, spacing: 8) {
-            Text("Eksplorasi wheel (final)")
+            Text("Eksplorasi wheel")
                 .font(.headline)
             if let p = FlavorCategory(rawValue: snapshot.primaryCategory) {
                 Label(snapshot.primaryCategory, systemImage: p.categoryIconName)
@@ -126,11 +126,11 @@ struct SessionHistoryDetailView: View {
         .cornerRadius(16)
 
         VStack(alignment: .leading, spacing: 10) {
-            Text("Saran next (dari data tersimpan)")
+            Text("Saran untuk seduhan berikutnya")
                 .font(.headline)
             Text(BrewHeuristics.nextBrewGuidance(for: snapshot.toSensoryEvaluation()))
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -142,7 +142,7 @@ struct SessionHistoryDetailView: View {
         HStack(alignment: .top) {
             Text(title)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
             Spacer()
             Text(value)
                 .font(.subheadline.weight(.semibold))
@@ -158,7 +158,7 @@ struct SessionHistoryDetailView: View {
         HStack(alignment: .top) {
             Text(title)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
             Spacer()
             Text(value)
                 .font(.subheadline.weight(.semibold))

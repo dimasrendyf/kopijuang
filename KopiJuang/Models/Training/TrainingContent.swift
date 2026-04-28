@@ -177,7 +177,7 @@ enum TrainingContent {
                 lead: "Hirup perlahan. Tandai jika ada kesan kardus, apek, karet, atau cairan pembersih. Catat intensitas & sifatnya — jangan terburu memvonis cacat.",
                 steps: [
                     "Beri jeda panjang antar hirupan agar hidung tidak lelah dan penilaian tidak bias.",
-                    "Beri skala gangguan 1–10 tanpa perlu memutuskan defek hanya dari hirupan awal."
+                    "Beri skala gangguan 0–10 tanpa perlu memutuskan defek hanya dari hirupan awal."
                 ],
                 reference: "Dalam cupping, temuan ganjil dideskripsikan dulu — analisis sumber dilakukan setelah pola keseluruhan terbentuk. (SCA)"
             )

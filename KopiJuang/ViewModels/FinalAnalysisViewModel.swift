@@ -68,7 +68,7 @@ final class FinalAnalysisViewModel {
     var spotlightMessage: String {
         let base = "Terekam di sesi: asam \(Int(evaluation.acidity)), manis \(Int(evaluation.sweetness)), pahit \(Int(evaluation.bitterness)), body \(Int(evaluation.bodyScore))."
         if let secondaryNote, let specificNote {
-            return "\(base) Kamu mengebor \(primaryCategory.rawValue) → \(secondaryNote) → \(specificNote). Detail wheel sudah menempel ke riwayat."
+            return "\(base) Kamu mempersempit rasa dari \(primaryCategory.rawValue) ke \(secondaryNote), lalu sampai ke \(specificNote). Detail pilihan ini sudah tersimpan di riwayat."
         }
         if let secondaryNote {
             return "\(base) Turunan: \(secondaryNote) di bawah payung \(primaryCategory.rawValue)."

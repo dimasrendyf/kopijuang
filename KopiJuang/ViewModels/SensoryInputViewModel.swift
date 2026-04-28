@@ -17,17 +17,17 @@ final class SensoryInputViewModel {
     var step: SensoryInputStep = .fragrance
     var scrollToTopNonce: Int = 0
 
-    var fragranceIntensity: Double = 6
+    var fragranceIntensity: Double = 0
     var fragranceCategory: FlavorCategory?
 
     var aromaContrast: AromaContrast = .unsure
-    var aromaIntensity: Double = 6
+    var aromaIntensity: Double = 0
     var aromaCategory: FlavorCategory?
 
-    var acidity: Double = 6
-    var sweetness: Double = 6
-    var bitterness: Double = 6
-    var bodyScore: Double = 6
+    var acidity: Double = 0
+    var sweetness: Double = 0
+    var bitterness: Double = 0
+    var bodyScore: Double = 0
     var tasteCategory: FlavorCategory?
 
     init(
@@ -52,12 +52,16 @@ final class SensoryInputViewModel {
     var canAdvanceFromCurrentStep: Bool {
         switch step {
         case .fragrance:
-            return fragranceCategory != nil
+            return fragranceCategory != nil && fragranceIntensity > 0
         case .aroma:
-            if aromaContrast == .same { return fragranceCategory != nil }
-            return aromaCategory != nil
+            if aromaContrast == .same { return fragranceCategory != nil && aromaIntensity > 0 }
+            return aromaCategory != nil && aromaIntensity > 0
         case .taste:
             return tasteCategory != nil
+                && acidity > 0
+                && sweetness > 0
+                && bitterness > 0
+                && bodyScore > 0
         }
     }
 

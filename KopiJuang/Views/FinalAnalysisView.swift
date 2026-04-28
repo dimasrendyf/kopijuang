@@ -35,7 +35,7 @@ struct FinalAnalysisView: View {
                         .font(.title2.bold())
                     Text("Ringkasan akhir setelah kamu memilih profil rasa sampai layer terluar.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top, 8)
@@ -43,13 +43,13 @@ struct FinalAnalysisView: View {
                 FinalCard(title: "Highlight profil") {
                     Text(viewModel.spotlightMessage)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
 
                 FinalCard(title: "Data yang terekam") {
                     Text(viewModel.flowDataSummary)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                         .multilineTextAlignment(.leading)
                 }
 
@@ -65,10 +65,10 @@ struct FinalAnalysisView: View {
                     }
                 }
 
-                FinalCard(title: "Saran Next Seduhan") {
+                FinalCard(title: "Saran untuk seduhan berikutnya") {
                     Text(viewModel.brewGuidance)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.primary.opacity(0.72))
                 }
 
                 FinalCard(title: "Progress Familiarity") {
@@ -79,15 +79,15 @@ struct FinalAnalysisView: View {
                         if let specificNote = viewModel.specificNote {
                             Text("Note \(specificNote) sudah kamu rasakan \(expCount)x.")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                         } else if let secondaryNote = viewModel.secondaryNote {
                             Text("Note \(secondaryNote) sudah kamu rasakan \(expCount)x.")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                         } else {
                             Text("Terus ulangi sesi di kategori ini agar familiarity naik bertahap.")
                                 .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.primary.opacity(0.72))
                         }
                     }
                 }

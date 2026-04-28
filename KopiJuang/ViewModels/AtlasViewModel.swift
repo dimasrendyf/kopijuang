@@ -34,10 +34,12 @@ final class AtlasViewModel {
             }
             let experienceCount = experienced.filter { $0 == node.name }.count
             list.append(FlavorNote(
+                id: node.id,
                 name: node.name,
                 category: node.layer == 1 ? node.name : (node.parent ?? ""),
                 description: node.description,
                 icon: node.layer == 1 ? "star.fill" : "circle.fill",
+                layer: node.layer,
                 isUnlocked: isUnlocked,
                 experienceCount: experienceCount,
                 familiarityLevel: familiarityLabel(for: experienceCount)

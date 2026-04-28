@@ -101,7 +101,7 @@ struct GuidePageView: View {
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-                .foregroundColor(.secondary)
+                .foregroundStyle(Color.primary.opacity(0.72))
             Spacer()
         }
         .padding()

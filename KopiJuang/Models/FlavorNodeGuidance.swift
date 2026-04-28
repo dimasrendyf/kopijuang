@@ -57,7 +57,7 @@ enum FlavorGuidanceData {
         // ─── L1: Fruity ───────────────────────────────────────────
         d["Fruity"] = FlavorNodeGuidance(
             parentNodeId: "Fruity",
-            intro: "Empat keluarga buah dibedakan dari tingkat ketajaman asam & berat rasa: sitrus paling tajam, beri asam-manis gelap, tropis penuh bulat, buah kering pekat manis.",
+            intro: "Empat kategori buah dibedakan dari tingkat ketajaman asam & berat rasa: sitrus paling tajam, beri asam-manis gelap, tropis penuh bulat, buah kering pekat manis.",
             hints: [
                 .init(nodeId: "berry",       sensoryHint: "Asam-manis dengan karakter 'merah/gelap' — blackberry, raspberry, blueberry. Tidak secerah & setajam sitrus."),
                 .init(nodeId: "citrus",      sensoryHint: "Paling tajam & cerah di depan lidah. Seperti memegang kulit lemon atau jeruk nipis segar."),
